@@ -1,0 +1,2157 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoQuiz - Petualangan Seru Menjaga Bumi Kita</title>
+  <link rel="icon" type="image/png" href="Foto/Logo1.png">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Fredoka & Plus Jakarta Sans -->
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    body {
+      font-family: 'Fredoka', sans-serif;
+    }
+    .font-sans-alt {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .puzzle-banner {
+      background-image: linear-gradient(rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.7)), url("Foto/Banner%20Puzzle.png");
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+    .cartoon-shadow {
+      box-shadow: 0 6px 0px 0px rgba(16, 185, 129, 0.25), 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+    .cartoon-shadow-hover:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 0px 0px rgba(16, 185, 129, 0.35), 0 15px 30px -5px rgba(0, 0, 0, 0.12);
+    }
+    .card-bubble {
+      border: 4px solid #ffffff;
+      box-shadow: 0 12px 30px -10px rgba(15, 23, 42, 0.12);
+    }
+    .heart-shake {
+      animation: shake 0.5s ease-in-out;
+    }
+    @keyframes shake {
+      0%, 100% { transform: scale(1); }
+      20% { transform: scale(1.4) rotate(-12deg); }
+      40% { transform: scale(0.8) rotate(12deg); }
+      60% { transform: scale(1.3) rotate(-6deg); }
+      80% { transform: scale(0.9) rotate(6deg); }
+    }
+    .float-anim {
+      animation: floatAnim 3s ease-in-out infinite;
+    }
+    @keyframes floatAnim {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+    .banner-cloud {
+      position: absolute;
+      left: 3%;
+      animation: bannerCloudDrift 18s ease-in-out infinite alternate;
+    }
+    .banner-cloud--slow {
+      animation-duration: 23s;
+      animation-delay: -11s;
+    }
+    .banner-cloud--medium {
+      animation-duration: 20s;
+      animation-delay: -6s;
+    }
+    .banner-cloud--fast {
+      animation-duration: 16s;
+      animation-delay: -3s;
+    }
+    .banner-cloud--last {
+      animation-duration: 25s;
+      animation-delay: -17s;
+    }
+    @keyframes bannerCloudDrift {
+      to { left: 78%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .banner-cloud { animation: none; }
+    }
+    .pulse-glow {
+      animation: pulseGlow 2s infinite;
+    }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.6); }
+      50% { box-shadow: 0 0 0 14px rgba(245, 158, 11, 0); }
+    }
+    .screen-enter {
+      animation: screenEnter 350ms ease-out both;
+    }
+    @keyframes screenEnter {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .zone-card-enter {
+      animation: zoneCardEnter 450ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    }
+    @keyframes zoneCardEnter {
+      from { opacity: 0; transform: translateY(14px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .question-enter {
+      animation: questionEnter 280ms ease-out both;
+    }
+    @keyframes questionEnter {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    button:not(:disabled) {
+      transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease;
+    }
+    button:not(:disabled):hover {
+      transform: translateY(-2px);
+    }
+    button:not(:disabled):active {
+      transform: translateY(0) scale(0.98);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+      }
+      .zone-card-enter {
+        animation-delay: 0ms !important;
+      }
+    }
+    @media (max-width: 639px) {
+      .hero-banner {
+        min-height: 0 !important;
+        align-items: flex-start !important;
+        background-position: 62% center !important;
+      }
+      .banner-cloud {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-b from-sky-200 via-emerald-50 to-amber-50 text-slate-800 min-h-screen flex flex-col justify-between selection:bg-amber-200 selection:text-amber-900 relative overflow-x-hidden">
+
+  <!-- ==================== HEADER & TOP STATS ==================== -->
+  <header class="bg-white/95 backdrop-blur-md border-b-4 border-emerald-200 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-3">
+      
+      <!-- Brand & Title -->
+      <div class="flex items-center space-x-4 cursor-pointer group" onclick="returnToMap()">
+        <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-400 to-emerald-500 flex items-center justify-center shadow-md group-hover:rotate-12 transition transform duration-300 border-2 border-white overflow-hidden">
+          <img src="Foto/Logo.png" alt="Logo EcoQuiz" class="w-full h-full object-contain p-1">
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="font-bold text-slate-900 text-xl tracking-wide">EcoQuiz</h1>
+          </div>
+          <p class="text-xs text-slate-500 font-sans-alt font-semibold">Petualangan Seru Menjaga Bumi Kita</p>
+        </div>
+      </div>
+      
+      <!-- User Profile & Stats Header -->
+      <div class="w-full sm:w-auto flex flex-wrap items-center justify-between gap-2 md:gap-3 text-xs font-semibold">
+        <!-- Title & Rank Pill -->
+        <div class="bg-emerald-50 border-2 border-emerald-300 px-3.5 py-2 rounded-2xl flex items-center space-x-2 shadow-sm">
+          <span class="text-lg" id="header-title-icon">🌱</span>
+          <div class="text-left font-sans-alt">
+            <div class="text-[9px] text-emerald-700 font-bold uppercase tracking-wider leading-none">Pangkatmu</div>
+            <span id="header-title-text" class="text-slate-900 font-extrabold text-xs">Penjelajah Cilik</span>
+          </div>
+        </div>
+
+        <!-- XP Counter -->
+        <div class="bg-amber-50 border-2 border-amber-300 px-3.5 py-2 rounded-2xl flex items-center space-x-2 text-amber-900 shadow-sm">
+          <span class="text-lg">⭐</span>
+          <div class="text-left font-sans-alt">
+            <div class="text-[9px] text-amber-700 font-bold uppercase tracking-wider leading-none">Total XP</div>
+            <span id="header-xp-text" class="font-extrabold text-xs">0 XP</span>
+          </div>
+        </div>
+
+        <!-- Badges Button -->
+        <button id="btn-open-badges" class="bg-teal-500 hover:bg-teal-600 text-white border-2 border-teal-600 px-3.5 py-2 rounded-2xl flex items-center space-x-1.5 transition shadow-sm font-bold">
+          <span class="text-base">🎒</span>
+          <span class="hidden sm:inline">Lencana</span>
+          <span id="header-badge-count" class="bg-amber-300 text-amber-950 text-[10px] px-2 py-0.5 rounded-full font-extrabold ml-1">0/8</span>
+        </button>
+
+        <!-- Background Music Toggle -->
+        <button id="btn-toggle-music" type="button" aria-label="Nyalakan musik latar" aria-pressed="false" title="Nyalakan musik latar" class="bg-white text-emerald-700 hover:bg-emerald-50 px-3 py-2 rounded-2xl transition border-2 border-emerald-200 flex items-center space-x-1.5 font-bold">
+          <span id="music-icon" aria-hidden="true">🔇</span>
+          <span id="music-status" class="hidden sm:inline">Musik Mati</span>
+        </button>
+
+        <!-- Reset Button -->
+        <button id="btn-reset-data" title="Mulai dari awal" class="p-2.5 bg-white text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-2xl transition border-2 border-slate-200">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+          </svg>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ==================== MAIN CONTENT WRAPPER ==================== -->
+  <main class="max-w-6xl mx-auto px-4 py-8 flex-grow w-full flex flex-col justify-center">
+
+    <!-- SCREEN 1: CAMPAIGN MAP (PETA ZONA) -->
+    <section id="screen-map" class="w-full">
+      
+      <!-- Welcome Hero Banner (Cartoon Style Matching Image) -->
+      <div class="hero-banner bg-gradient-to-r from-sky-400 via-teal-400 to-emerald-400 text-white rounded-3xl p-4 sm:p-6 md:p-8 mb-8 card-bubble relative flex min-h-[360px] sm:min-h-[400px] md:min-h-[440px] items-center overflow-hidden border-4 border-white shadow-xl" style="background-image: linear-gradient(90deg, rgba(56, 189, 248, 0.45), rgba(45, 212, 191, 0.45), rgba(52, 211, 153, 0.45)), url('Foto/BgBanner.png'); background-size: cover; background-position: center;">
+        <div aria-hidden="true" class="banner-cloud top-[12%] text-5xl md:text-6xl opacity-100 pointer-events-none select-none">☁️</div>
+        <div aria-hidden="true" class="banner-cloud banner-cloud--slow top-[35%] text-4xl md:text-5xl opacity-100 pointer-events-none select-none">☁️</div>
+        <div aria-hidden="true" class="banner-cloud banner-cloud--medium top-[58%] text-5xl md:text-6xl opacity-100 pointer-events-none select-none">☁️</div>
+        <div aria-hidden="true" class="banner-cloud banner-cloud--fast top-[78%] text-4xl md:text-5xl opacity-100 pointer-events-none select-none">☁️</div>
+        <div aria-hidden="true" class="banner-cloud banner-cloud--last top-[22%] text-3xl md:text-4xl opacity-100 pointer-events-none select-none">☁️</div>
+        <img src="Foto/matahari.png" alt="Matahari" class="absolute right-4 top-5 opacity-90 w-24 h-24 object-contain pointer-events-none select-none float-anim hidden md:block">
+        <div class="w-full max-w-xl relative z-10">
+          <div class="inline-flex items-center space-x-2 bg-white/30 border-2 border-white/50 text-white text-xs font-bold px-4 py-1.5 rounded-full mb-3 backdrop-blur-sm shadow-sm">
+            <span>🌿</span> <span>Petualangan Dimulai!</span>
+          </div>
+          <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight mb-2 drop-shadow text-slate-900">
+            Ayo Taklukkan 8 Zona dan Jadi Master <span class="text-emerald-900">Eco</span>
+          </h2>
+          <p class="text-slate-800 text-xs md:text-sm font-sans-alt font-medium leading-relaxed mb-6 bg-white/40 p-3 rounded-2xl backdrop-blur-xs">
+            Pilih zona petualanganmu, jawab kuisnya dengan benar, kumpulkan XP, jaga 3 nyawamu, dan kumpulkan semua lencana keren!
+          </p>
+
+          <!-- XP Progress Bar to Next Title -->
+          <div class="bg-amber-900/20 border-2 border-white/60 rounded-2xl p-4 max-w-lg backdrop-blur-sm shadow-inner">
+            <div class="flex justify-between items-center text-xs mb-2 font-bold font-sans-alt text-slate-900">
+              <span class="flex items-center space-x-1.5">
+                <span>⚡ Target Pangkat:</span>
+                <span id="next-title-name" class="text-amber-900 font-extrabold">Pengawal Energi (500 XP)</span>
+              </span>
+              <span id="xp-progress-percent" class="text-slate-900 font-mono">0%</span>
+            </div>
+            <div class="w-full bg-slate-900/30 rounded-full h-4 overflow-hidden p-0.5 border border-white/40 shadow-inner">
+              <div id="xp-progress-bar" class="bg-gradient-to-r from-amber-400 to-emerald-500 h-full rounded-full transition-all duration-700 shadow" style="width: 0%"></div>
+            </div>
+            <div class="flex justify-between text-[11px] text-slate-800 mt-1.5 font-bold font-sans-alt">
+              <span id="xp-current-info">0 XP</span>
+              <span id="xp-next-target">Max: 2000 XP</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Title -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+        <div>
+          <h3 class="text-xl sm:text-2xl font-bold text-slate-900 flex items-center space-x-2">
+            <span>⭐ Pilihan Zona Misi Seru</span>
+          </h3>
+          <p class="text-xs text-slate-500 font-sans-alt font-medium">Pilih zona yang terbuka untuk mulai bermain!</p>
+        </div>
+        <div class="max-w-full text-xs font-bold text-slate-700 bg-white border-2 border-emerald-300 px-4 py-2.5 rounded-2xl shadow-sm">
+          <span>⭐ Misi Selesai: </span><span id="overall-progress-text" class="text-emerald-600 font-bold">0 / 8 Zona</span>
+        </div>
+      </div>
+
+      <!-- Zones Grid (Campaign Path) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="zones-container">
+        <!-- Rendered Dynamically by JS -->
+      </div>
+
+      <div class="puzzle-banner border-4 border-amber-200 rounded-3xl p-5 md:p-6 mt-8 card-bubble">
+        <div class="text-center mb-5">
+          <h3 class="text-lg font-bold text-slate-900">🧩 Puzzle Penjaga Bumi</h3>
+          <p class="text-xs text-slate-500 font-sans-alt mt-1">
+            Selesaikan semua soal dengan benar untuk mendapatkan setiap pecahan puzzle.
+          </p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div class="bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="text-center sm:text-left">
+              <h4 class="font-bold text-emerald-900">Puzzle Zona 1–4</h4>
+              <p id="puzzle-progress-zones-1-4" class="text-xs text-slate-600 font-sans-alt mt-1">0/4 pecahan terkumpul.</p>
+            </div>
+            <div class="grid grid-cols-2 grid-rows-2 gap-1.5 w-40 h-40 shrink-0" aria-label="Puzzle Zona 1 sampai 4">
+              <div id="puzzle-piece-zone1" class="rounded-xl overflow-hidden border-2 border-slate-200 bg-slate-200 grayscale opacity-40 relative" aria-label="Pecahan puzzle zona 1 belum didapat"><span class="absolute inset-0 flex items-center justify-center text-white text-xs font-bold drop-shadow">Zona 1 🔒</span></div>
+              <div id="puzzle-piece-zone2" class="rounded-xl overflow-hidden border-2 border-slate-200 bg-slate-200 grayscale opacity-40 relative" aria-label="Pecahan puzzle zona 2 belum didapat"><span class="absolute inset-0 flex items-center justify-center text-white text-xs font-bold drop-shadow">Zona 2 🔒</span></div>
+              <div id="puzzle-piece-zone3" class="rounded-xl overflow-hidden border-2 border-slate-200 bg-slate-200 grayscale opacity-40 relative" aria-label="Pecahan puzzle zona 3 belum didapat"><span class="absolute inset-0 flex items-center justify-center text-white text-xs font-bold drop-shadow">Zona 3 🔒</span></div>
+              <div id="puzzle-piece-zone4" class="rounded-xl overflow-hidden border-2 border-slate-200 bg-slate-200 grayscale opacity-40 relative" aria-label="Pecahan puzzle zona 4 belum didapat"><span class="absolute inset-0 flex items-center justify-center text-white text-xs font-bold drop-shadow">Zona 4 🔒</span></div>
+            </div>
+          </div>
+          <div class="bg-sky-50 border-2 border-sky-200 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="text-center sm:text-left">
+              <h4 class="font-bold text-sky-900">Puzzle Zona 5–8</h4>
+              <p id="puzzle-progress-zones-5-8" class="text-xs text-slate-600 font-sans-alt mt-1">0/4 pecahan terkumpul.</p>
+            </div>
+            <div class="grid grid-cols-2 grid-rows-2 gap-1.5 w-40 h-40 shrink-0" aria-label="Puzzle Zona 5 sampai 8">
+              <div id="puzzle-piece-zone5" class="rounded-xl overflow-hidden border-2 border-slate-200 bg-slate-200 grayscale opacity-40 relative" aria-label="Pecahan puzzle zona 5 belum didapat"><span class="absolute inset-0 flex items-center justify-center text-white text-xs font-bold drop-shadow">Zona 5 🔒</span></div>
+              <div id="puzzle-piece-zone6" class="rounded-xl overflow-hidden border-2 border-slate-200 bg-slate-200 grayscale opacity-40 relative" aria-label="Pecahan puzzle zona 6 belum didapat"><span class="absolute inset-0 flex items-center justify-center text-white text-xs font-bold drop-shadow">Zona 6 🔒</span></div>
+              <div id="puzzle-piece-zone7" class="rounded-xl overflow-hidden border-2 border-slate-200 bg-slate-200 grayscale opacity-40 relative" aria-label="Pecahan puzzle zona 7 belum didapat"><span class="absolute inset-0 flex items-center justify-center text-white text-xs font-bold drop-shadow">Zona 7 🔒</span></div>
+              <div id="puzzle-piece-zone8" class="rounded-xl overflow-hidden border-2 border-slate-200 bg-slate-200 grayscale opacity-40 relative" aria-label="Pecahan puzzle zona 8 belum didapat"><span class="absolute inset-0 flex items-center justify-center text-white text-xs font-bold drop-shadow">Zona 8 🔒</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- SCREEN 2: QUIZ IN-GAME AREA -->
+    <section id="screen-quiz" class="hidden w-full">
+      
+      <!-- Top Zone Status Bar -->
+      <div class="bg-white border-4 border-emerald-200 rounded-2xl p-3 sm:p-4 mb-5 card-bubble flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center space-x-3">
+          <button id="btn-back-to-map" class="p-2.5 hover:bg-slate-100 rounded-xl transition text-slate-700 border-2 border-slate-200 flex items-center space-x-1.5 text-xs font-bold">
+            <span>⬅</span>
+            <span class="hidden sm:inline">Peta Misi</span>
+          </button>
+          <div>
+            <div class="text-[10px] font-bold uppercase text-emerald-600 tracking-wider" id="quiz-zone-badge">ZONA 1: KAMAR TIDUR</div>
+            <h3 class="font-bold text-slate-900 text-sm md:text-base leading-tight" id="quiz-zone-title">Kamar Tidurku yang Hemat</h3>
+          </div>
+        </div>
+
+        <!-- Lives & Score -->
+        <div class="w-full sm:w-auto flex flex-wrap items-center justify-between gap-2">
+          <!-- Nyawa (Lives) Display -->
+          <div class="bg-rose-50 border-2 border-rose-200 px-2.5 sm:px-3.5 py-1.5 rounded-2xl flex items-center space-x-2 shadow-sm">
+            <span class="text-xs font-bold text-rose-500 uppercase tracking-wider">NYAWA:</span>
+            <div id="lives-container" class="flex space-x-1 text-base">
+              <span class="heart-icon">❤️</span>
+              <span class="heart-icon">❤️</span>
+              <span class="heart-icon">❤️</span>
+            </div>
+          </div>
+
+          <!-- Skor Berjalan -->
+          <div class="bg-slate-50 border-2 border-slate-200 px-3.5 py-1.5 rounded-2xl text-center min-w-[70px]">
+            <span class="text-[10px] text-slate-400 font-bold block uppercase leading-none font-sans-alt">SKOR</span>
+            <span id="quiz-score-display" class="font-bold text-slate-900 text-sm">0</span>
+          </div>
+
+          <!-- Indikator Nomor Soal -->
+          <div class="bg-slate-50 border-2 border-slate-200 px-3.5 py-1.5 rounded-2xl text-center min-w-[65px]">
+            <span class="text-[10px] text-slate-400 font-bold block uppercase leading-none font-sans-alt">SOAL</span>
+            <span id="quiz-question-number" class="font-bold text-slate-900 text-sm">1/4</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Quiz Layout: Host Sidebar + Question Content -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- HOST PRESENTER SIDEBAR -->
+        <div class="lg:col-span-4 bg-white border-4 border-emerald-200 rounded-3xl p-4 sm:p-5 card-bubble flex flex-col items-center text-center">
+          <!-- Presenter Avatar -->
+          <div class="relative w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 mb-3 rounded-2xl overflow-hidden bg-gradient-to-b from-amber-100 to-emerald-100 border-4 border-emerald-300 flex items-center justify-center shadow-inner float-anim">
+            <img src="./Foto/BangBot.png" alt="Bang Bot" class="w-full h-full object-contain">
+            <div class="absolute bottom-1 right-1 bg-emerald-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow">
+              Bang Bot
+            </div>
+          </div>
+
+          <h4 class="font-bold text-slate-900 text-base">BANG BOT</h4>
+          <p class="text-xs text-slate-400 font-sans-alt font-medium mb-3">Sahabat Pahlawan Bumi</p>
+          
+          <!-- Host Dialogue Bubble -->
+          <div class="bg-emerald-50 border-2 border-emerald-200 p-3.5 rounded-2xl w-full text-xs text-slate-700 relative text-left font-sans-alt shadow-sm">
+            <div class="font-bold text-emerald-900 mb-1 flex items-center space-x-1.5 text-xs">
+              <span>💬</span> <span>Kata Bang Bot:</span>
+            </div>
+            <p id="host-dialogue-text" class="leading-relaxed italic">"Halo teman-teman! Yuk baca soalnya pelan-pelan dan pilih jawaban yang paling hebat!"</p>
+          </div>
+
+          <!-- Lifelines Box -->
+          <div class="mt-4 w-full pt-4 border-t-2 border-slate-100">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-sans-alt">Bantuan Seru (1x)</span>
+              <span class="text-[10px] text-emerald-600 font-bold">Lifelines</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+              <button id="lifeline-5050" class="bg-slate-50 border-2 border-slate-200 hover:border-emerald-500 hover:bg-emerald-50 hover:text-emerald-900 p-2.5 rounded-2xl text-xs font-bold transition flex flex-col items-center justify-center group shadow-sm">
+                <span class="text-base mb-0.5 group-hover:scale-110 transition">✂️</span>
+                <span class="text-[11px]">50:50</span>
+              </button>
+              <button id="lifeline-time" class="bg-slate-50 border-2 border-slate-200 hover:border-emerald-500 hover:bg-emerald-50 hover:text-emerald-900 p-2.5 rounded-2xl text-xs font-bold transition flex flex-col items-center justify-center group shadow-sm">
+                <span class="text-base mb-0.5 group-hover:scale-110 transition">⏱️</span>
+                <span class="text-[11px]">+10s</span>
+              </button>
+              <button id="lifeline-double" class="bg-slate-50 border-2 border-slate-200 hover:border-emerald-500 hover:bg-emerald-50 hover:text-emerald-900 p-2.5 rounded-2xl text-xs font-bold transition flex flex-col items-center justify-center group shadow-sm">
+                <span class="text-base mb-0.5 group-hover:scale-110 transition">✨</span>
+                <span class="text-[11px]">2x Poin</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- QUESTION & CASE STUDY DISPLAY -->
+        <div class="lg:col-span-8 space-y-4">
+          
+          <!-- Timer Bar Card -->
+          <div class="bg-white border-4 border-emerald-200 rounded-2xl p-4 card-bubble flex items-center justify-between">
+            <div class="flex items-center space-x-3 w-full mr-4">
+              <span class="text-xs font-bold text-slate-400 font-sans-alt">WAKTU</span>
+              <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden border border-slate-200">
+                <div id="quiz-timer-bar" class="bg-emerald-500 h-full rounded-full transition-all duration-1000 w-full"></div>
+              </div>
+            </div>
+            <span id="quiz-timer-text" class="font-bold text-slate-900 text-lg w-10 text-right font-mono">25s</span>
+          </div>
+
+          <!-- Main Question Card -->
+          <div id="quiz-question-card" class="bg-white border-4 border-emerald-200 rounded-3xl p-6 md:p-8 card-bubble">
+            
+            <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+              <span id="quiz-case-category" class="bg-emerald-100 text-emerald-800 text-xs font-bold px-3.5 py-1.5 rounded-full border-2 border-emerald-300">
+                Tantangan: Lampu Kamar
+              </span>
+              <span id="quiz-multiplier-badge" class="hidden bg-amber-100 text-amber-900 text-xs font-bold px-3.5 py-1.5 rounded-full border-2 border-amber-300 pulse-glow">
+                🔥 Poin Ganda Aktif!
+              </span>
+            </div>
+
+            <!-- Case Study Image Preview -->
+            <div id="quiz-image-container" class="mb-5 rounded-2xl overflow-hidden border-2 border-slate-200 bg-slate-50 flex flex-col items-center justify-center p-2 relative">
+              <img id="quiz-image" src="" alt="Ilustrasi Tantangan" class="w-full h-48 sm:h-64 object-cover rounded-xl shadow-sm">
+              <p id="quiz-image-caption" class="text-xs text-slate-500 font-sans-alt mt-2 font-medium italic text-center px-2">
+                Memuat gambar tantangan...
+              </p>
+            </div>
+
+            <!-- Question Text -->
+            <h3 id="quiz-question-title" class="text-base md:text-lg font-bold text-slate-900 leading-snug mb-5">
+              Memuat pertanyaan...
+            </h3>
+
+            <!-- Options Container -->
+            <div id="quiz-options-container" class="grid grid-cols-1 gap-3">
+              <!-- Dynamically populated options -->
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- SCREEN 3: ZONE COMPLETION & EVALUATION -->
+    <section id="screen-zone-result" class="hidden bg-white border-4 border-emerald-200 rounded-3xl p-4 sm:p-6 md:p-10 card-bubble max-w-2xl mx-auto w-full my-auto text-center">
+      
+      <div class="w-24 h-24 bg-amber-100 border-4 border-amber-300 rounded-3xl flex items-center justify-center text-5xl mx-auto mb-4 shadow-sm float-anim" id="zone-result-icon">
+        🏆
+      </div>
+
+      <div class="inline-block px-4 py-1.5 bg-emerald-100 text-emerald-900 font-bold text-xs uppercase tracking-widest rounded-full mb-2 border-2 border-emerald-300" id="zone-result-status-tag">
+        MISI ZONA BERHASIL DITUNTASKAN!
+      </div>
+      
+      <h2 class="text-2xl md:text-3xl font-bold text-slate-900 mb-2" id="zone-result-title">
+        Hebat Banget! Kamu Selesaikan Zona 1
+      </h2>
+      <p class="text-slate-500 font-sans-alt text-xs md:text-sm max-w-md mx-auto mb-6" id="zone-result-desc">
+        Kamu membuktikan diri sebagai anak yang peduli energi di rumah!
+      </p>
+
+      <!-- Stars Rating -->
+      <div class="flex justify-center space-x-2 text-4xl mb-6" id="zone-result-stars">
+        <span>⭐</span><span>⭐</span><span>⭐</span>
+      </div>
+
+      <!-- Stats Summary Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6 font-sans-alt">
+        <div class="bg-slate-50 border-2 border-slate-200 p-4 rounded-2xl text-center">
+          <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">SKOR KAMU</div>
+          <div id="zone-res-score" class="text-xl md:text-2xl font-extrabold text-slate-900">0</div>
+        </div>
+        <div class="bg-emerald-50 border-2 border-emerald-200 p-4 rounded-2xl text-center">
+          <div class="text-[10px] text-emerald-600 font-bold uppercase tracking-wider">+XP DIDAPAT</div>
+          <div id="zone-res-xp" class="text-xl md:text-2xl font-extrabold text-emerald-700">+0 XP</div>
+        </div>
+        <div class="bg-slate-50 border-2 border-slate-200 p-4 rounded-2xl text-center">
+          <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">NYAWA SISA</div>
+          <div id="zone-res-lives" class="text-xl md:text-2xl font-extrabold text-slate-900">❤️❤️❤️</div>
+        </div>
+      </div>
+
+      <!-- NEW UNLOCKED BADGE BANNER (If Applicable) -->
+      <div id="zone-new-badge-box" class="hidden bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-300 rounded-2xl p-4 mb-6 text-center shadow-sm">
+        <div class="text-3xl mb-1" id="new-badge-icon">🎖️</div>
+        <div class="text-xs font-bold text-amber-900 uppercase tracking-wider">Lencana Baru Terbuka!</div>
+        <h4 class="font-bold text-amber-950 text-base" id="new-badge-name">Bintang Kamar Tidur</h4>
+        <p class="text-xs text-amber-800 font-sans-alt mt-0.5" id="new-badge-desc">Kamu hebat dalam menghemat listrik di kamar sendiri.</p>
+      </div>
+
+      <div id="zone-puzzle-reward-box" class="hidden bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-300 rounded-2xl p-4 mb-6 text-center">
+        <div class="text-3xl mb-1" id="zone-puzzle-reward-icon">🧩</div>
+        <h4 class="font-bold text-emerald-950 text-base" id="zone-puzzle-reward-title">Pecahan Puzzle Zona Didapat!</h4>
+        <p class="text-xs text-emerald-800 font-sans-alt mt-0.5" id="zone-puzzle-reward-desc"></p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-col sm:flex-row justify-center gap-3">
+        <button id="btn-zone-continue" class="w-full sm:w-auto justify-center px-7 py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-2xl transition shadow-md text-sm flex items-center space-x-2 border-2 border-emerald-600">
+          <span id="btn-zone-continue-text">Lanjut ke Zona Berikutnya</span>
+          <span>➔</span>
+        </button>
+        <button onclick="returnToMap()" class="w-full sm:w-auto px-7 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-2xl transition text-sm border-2 border-slate-200">
+          Kembali ke Peta
+        </button>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ==================== MODALS & DRAWERS ==================== -->
+
+  <!-- 1. CASE STUDY INSIGHT MODAL -->
+  <div id="modal-insight" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 md:p-8 card-bubble border-4 border-emerald-200 transform transition-all">
+      
+      <!-- Feedback Header -->
+      <div class="flex items-center space-x-3 mb-4 pb-3 border-b-2 border-slate-100" id="insight-feedback-header">
+        <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl font-bold shadow-sm" id="insight-badge-icon">
+          🎉
+        </div>
+        <div>
+          <h4 class="font-bold text-lg leading-tight" id="insight-status-title">Hebat Sekali!</h4>
+          <p class="text-xs font-bold text-slate-400 font-sans-alt" id="insight-status-subtitle">+100 Poin & +25 XP</p>
+        </div>
+      </div>
+
+      <!-- Insight Fact Box -->
+      <div class="bg-amber-50 border-2 border-amber-200 rounded-2xl p-4 mb-3.5 text-left font-sans-alt">
+        <div class="flex items-center space-x-1.5 font-bold text-amber-950 text-xs mb-1">
+          <span>💡</span> <span>TAHUKAH KAMU?</span>
+        </div>
+        <p class="text-xs md:text-sm text-amber-900 leading-relaxed font-medium" id="insight-fact-text">
+          Fakta menarik tentang energi listrik...
+        </p>
+      </div>
+
+      <!-- Practical Action Tips Box -->
+      <div class="bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4 mb-6 text-left font-sans-alt">
+        <div class="flex items-center space-x-1.5 font-bold text-emerald-950 text-xs mb-1">
+          <span>🌱</span> <span>TIPS AKSI KEREN:</span>
+        </div>
+        <p class="text-xs md:text-sm text-emerald-900 leading-relaxed font-medium" id="insight-action-text">
+          Tips praktis untuk anak hebat...
+        </p>
+      </div>
+
+      <!-- Modal Action Button -->
+      <button id="btn-next-question" class="w-full py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-2xl transition duration-200 shadow-md flex items-center justify-center space-x-2 text-sm border-2 border-emerald-600">
+        <span id="btn-next-question-text">Lanjut ke Soal Berikutnya</span>
+        <span>➔</span>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- 2. GAME OVER MODAL -->
+  <div id="modal-gameover" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-md w-full max-h-[90vh] overflow-y-auto p-6 md:p-8 card-bubble border-4 border-rose-200 text-center">
+      <div class="w-20 h-20 bg-rose-100 border-4 border-rose-300 rounded-3xl flex items-center justify-center text-4xl mx-auto mb-3 shadow-sm">
+        💪
+      </div>
+      <h3 class="text-2xl font-bold text-slate-900 mb-1">Jangan Menyerah, Coba Lagi ya!</h3>
+      <p class="text-xs md:text-sm text-slate-500 font-sans-alt mb-5 leading-relaxed">
+        Nyawamu habis, tapi pahlawan sejati tidak pernah menyerah. Yuk, ulangi zonanya dan jawab dengan lebih teliti!
+      </p>
+
+      <div class="bg-emerald-50 border-2 border-emerald-200 p-3.5 rounded-2xl mb-6 text-xs text-emerald-900 italic font-sans-alt">
+        "Kegagalan adalah guru terbaik untuk menjadi anak yang pintar!" — Kak Rian
+      </div>
+
+      <div class="space-y-2.5">
+        <button id="btn-retry-zone" class="w-full py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-2xl transition shadow text-sm border-2 border-emerald-600">
+          Coba Lagi Zona Ini 🔄
+        </button>
+        <button onclick="closeGameOverAndReturnMap()" class="w-full py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-2xl transition text-sm border-2 border-slate-200">
+          Kembali ke Peta Misi
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. E-BADGES COLLECTION MODAL -->
+  <div id="modal-badges" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-xl w-full p-6 md:p-8 card-bubble border-4 border-amber-200 max-h-[90vh] overflow-y-auto">
+      
+      <div class="flex items-center justify-between pb-4 border-b-2 border-slate-100 mb-5">
+        <div class="flex items-center space-x-2">
+          <span class="text-3xl">🎒</span>
+          <div>
+            <h3 class="font-bold text-slate-900 text-lg leading-tight">Koleksi Lencana Pahlawan Bumi</h3>
+            <p class="text-xs text-slate-400 font-sans-alt">Kumpulkan semua lencananya dengan menuntaskan zona!</p>
+          </div>
+        </div>
+        <button id="btn-close-badges" class="p-2.5 hover:bg-slate-100 rounded-2xl text-slate-400 hover:text-slate-700 transition border border-slate-200">
+          ✕
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="badges-list-container">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <div class="mt-6 pt-4 border-t-2 border-slate-100 text-center">
+        <button onclick="document.getElementById('modal-badges').classList.add('hidden')" class="px-7 py-3 bg-slate-900 text-white rounded-2xl font-bold text-xs hover:bg-slate-800 transition shadow">
+          Tutup Koleksi
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== FOOTER WITH CARTOON GRASS & MASKOT ==================== -->
+  <footer class="bg-gradient-to-t from-emerald-400 to-emerald-300 border-t-4 border-emerald-400 pt-6 pb-4 mt-10 text-slate-900 relative">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
+      <div class="text-xs font-bold font-sans-alt text-emerald-950">
+        EcoQuiz • Game Edukasi Hemat Energi
+      </div>
+      <div class="bg-white/90 border-2 border-white px-4 py-2 rounded-2xl shadow-sm text-xs font-bold flex items-center space-x-2 text-slate-800">
+        <span>🌍</span>
+        <span>Ayo jadi pahlawan bumi mulai dari sekarang!</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== SCRIPT & GAME LOGIC ==================== -->
+  <script>
+    /* =====================================================================
+       1. DATA ZONA & PERTANYAAN KHUSUS KELAS 5 SD
+       ===================================================================== */
+    const ZONES_DATA = [
+      {
+        id: "zone1",
+        number: 1,
+        title: "Kamar Tidur & Belajar",
+        subtitle: "Zona Kamar Cerdas",
+        icon: "🛏️",
+        coverImage: "Foto/Banner1.jpeg",
+        badgeId: "badge_kamar",
+        badgeName: "Bintang Kamar Tidur",
+        badgeIcon: "🛏️",
+        badgeDesc: "Jagoan yang selalu merawat energi di kamar tidur dan meja belajar.",
+        description: "Petualangan pertama di kamar tidur! Cari tahu cara hemat listrik dari lampu belajar, charger HP, dan kipas angin.",
+        questions: [
+          {
+            category: "Lampu Belajar di Siang Hari",
+            image: "Zona 1/soal1.jpeg",
+            caption: "Kamar tidur terang karena cahaya matahari pagi, tapi lampu meja belajar dibiarkan menyala.",
+            question: "Apa yang sebaiknya kamu lakukan saat belajar di siang hari yang cerah?",
+            options: [
+              "Mematikan lampu belajar dan memanfaatkan cahaya matahari dari jendela",
+              "Menyalakan semua lampu kamar agar semakin menyilaukan mata",
+              "Menutup gorden rapat-rapat lalu menyalakan senter",
+              "Membiarkan lampu menyala supaya kamar terlihat keren"
+            ],
+            answer: 0,
+            fact: "Cahaya matahari alami dari luar itu gratis dan sehat untuk mata kita, lho! Mematikannya saat siang hari menghemat banyak listrik.",
+            actionTip: "Biasakan buka gorden jendela kamarmu di pagi hari dan matikan lampu jika sudah tidak dipakai."
+          },
+          {
+            category: "Charger HP Penuh",
+            image: "Zona 1/soal2.jpeg",
+            caption: "Baterai HP sudah 100% penuh, tetapi kabel charger masih menancap di stopkontak.",
+            question: "Tindakan yang paling benar setelah selesai mengisi baterai (mengecas) HP adalah...",
+            options: [
+              "Mencabut charger dari stopkontak agar listrik tidak terbuang sia-sia",
+              "Membiarkan charger menancap semalaman penuh",
+              "Menyambungkan kabel ke mainan robot-robotan",
+              "Menyimpan HP di bawah bantal sambil terus dicolok"
+            ],
+            answer: 0,
+            fact: "Charger yang tetap menancap walau HP-nya sudah dicabut tetap menyedot sedikit listrik secara diam-diam (vampir listrik)!",
+            actionTip: "Ingat ya! Kalau baterai sudah penuh, langsung cabut charger dari colokan listrik."
+          },
+          {
+            category: "Kipas Angin Ditinggal Pergi",
+            image: "Zona 1/soal3.jpeg",
+            caption: "Kipas angin di kamar berputar kencang, padahal kamu mau pergi bermain ke lapangan.",
+            question: "Apa sikap hebat yang harus kamu lakukan sebelum meninggalkan kamar?",
+            options: [
+              "Mematikan sakelar kipas angin dan mencabut kabelnya jika perlu",
+              "Membiarkan kipas berputar kencang supaya kamar tetap dingin saat pulang",
+              "Meminta tolong kucing peliharaan untuk mematikannya",
+              "Menambah kecepatan kipas ke level paling tinggi"
+            ],
+            answer: 0,
+            fact: "Kipas angin yang menyala di ruangan kosong tidak ada gunanya, itu sama saja membuang-buang energi listrik rumahmu.",
+            actionTip: "Selalu cek lampu, kipas angin, dan peralatan elektronik sebelum keluar kamar ya!"
+          },
+          {
+            category: "Bermain Game di Gadget",
+            image: "Zona 1/soal4.jpeg",
+            caption: "Bermain game di tablet sambil mengisi daya (sambil mengecas) berjam-jam.",
+            question: "Selain boros listrik, apa akibat buruk mengecas gadget sambil dimainkan terus-menerus?",
+            options: [
+              "Baterai gadget bisa cepat rusak, kembung, bahkan berbahaya",
+              "Tablet kamu akan berubah menjadi robottransformers",
+              "Jaringan internet di rumah akan bertambah sangat cepat",
+              "Layar tablet berubah menjadi warna pelangi selamanya"
+            ],
+            answer: 0,
+            fact: "Mengecas sambil bermain game membuat baterai bekerja terlalu berat, cepat panas, dan boros energi listrik.",
+            actionTip: "Tunggu sampai baterai penuh dulu sebelum kamu pakai bermain game dengan santai!"
+          }
+        ]
+      },
+      {
+        id: "zone2",
+        number: 2,
+        title: "Ruang Keluarga & Hiburan",
+        subtitle: "Zona Ruang Keluarga",
+        icon: "📺",
+        coverImage: "Foto/Banner2.jpeg",
+        badgeId: "badge_keluarga",
+        badgeName: "Pahlawan Ruang Keluarga",
+        badgeIcon: "📺",
+        badgeDesc: "Pintar mengatur penggunaan televisi dan AC bersama keluarga di rumah.",
+        description: "Waktunya bersantai bersama keluarga! Pelajari cara asyik menikmati televisi dan pendingin ruangan tanpa boros energi.",
+        questions: [
+          {
+            category: "Televisi Menyala Tanpa Penonton",
+            image: "Zona 2/soal1.jpeg",
+            caption: "Televisi di ruang keluarga menyala nyaring, tapi semua anggota keluarga sedang makan di dapur.",
+            question: "Apa yang sebaiknya kamu lakukan saat melihat televisi menyala tanpa ada yang menonton?",
+            options: [
+              "Segera mematikan televisi tersebut dengan meremot atau menekan tombolnya",
+              "Meninggalkannya karena nanti malam mungkin akan ditonton lagi",
+              "Menaikkan volume suara TV agar terdengar sampai ke dapur",
+              "Menonton sendirian dari kejauhan sambil tidur"
+            ],
+            answer: 0,
+            fact: "Membiarkan televisi menyala kosong selama beberapa jam sama dengan menyia-nyiakan banyak energi listrik.",
+            actionTip: "Jadilah anak yang sigap: 'Tidak ada orang di ruangan, matikan televisinya!'"
+          },
+          {
+            category: "Suhu Remote AC",
+            image: "Zona 2/soal2.jpeg",
+            caption: "Ruang keluarga terasa dingin, tetapi adik mencet remot AC sampai suhu 16°C.",
+            question: "Berapa suhu AC yang paling pas dan hemat energi untuk kesehatan kita di rumah?",
+            options: [
+              "Suhu 24°C - 25°C sudah sejuk dan sangat hemat listrik",
+              "Suhu paling dingin 16°C agar bisa pakai jaket tebal di dalam rumah",
+              "Suhu 30°C sambil menyalakan kompor minyak",
+              "Mematikan AC lalu membuka semua dinding rumah"
+            ],
+            answer: 0,
+            fact: "Menyetel AC terlalu dingin (16°C) membuat mesin bekerja sangat berat dan tagihan listrik rumah melonjak tinggi.",
+            actionTip: "Atur suhu AC di angka 24 atau 25 derajat Celsius saja. Sudah nyaman dan ramah lingkungan!"
+          },
+          {
+            category: "Pintu dan Jendela saat AC Menyala",
+            image: "Zona 2/soal3.jpeg",
+            caption: "AC di ruang tamu menyala dingin, tetapi pintu halaman belakang dibiarkan terbuka lebar.",
+            question: "Mengapa pintu dan jendela harus ditutup rapat saat AC sedang dinyalakan?",
+            options: [
+              "Agar udara dingin tidak keluar dan AC tidak bekerja terlalu berat",
+              "Supaya angin dari luar bisa masuk bertarung dengan udara AC",
+              "Supaya nyamuk dari luar bisa masuk ke dalam rumah dengan mudah",
+              "Karena itu adalah aturan agar lantai cepat kering"
+            ],
+            answer: 0,
+            fact: "Jika pintu terbuka saat AC menyala, udara dingin akan keluar dan udara panas masuk, membuat AC boros listrik.",
+            actionTip: "Ingatkan anggota keluarga untuk menutup pintu jika AC sedang dinyalakan ya."
+          },
+          {
+            category: "Lampu Hias Ruang Tamu",
+            image: "Zona 2/soal4.jpeg",
+            caption: "Lampu hias warna-warni di ruang tamu menyala siang dan malam tanpa henti.",
+            question: "Bagaimana cara bijak menggunakan lampu hias atau lampu tidur di rumah?",
+            options: [
+              "Nyalakan hanya saat malam hari atau saat ada acara keluarga saja",
+              "Biarkan menyala 24 jam sehari supaya rumah terlihat meriah",
+              "Dicat dengan warna hitam agar cahayanya tidak terlihat",
+              "Dilemparkan ke halaman tetangga"
+            ],
+            answer: 0,
+            fact: "Lampu hias yang dibiarkan menyala terus menerus menyedot listrik tanpa keperluan yang jelas.",
+            actionTip: "Gunakan lampu hias seperlunya saja agar energi listrik tetap terjaga."
+          }
+        ]
+      },
+      {
+        id: "zone3",
+        number: 3,
+        title: "Dapur & Rumah Hebat",
+        subtitle: "Zona Dapur & Sekitar",
+        icon: "🍳",
+        coverImage: "Foto/Banner3.jpeg",
+        badgeId: "badge_dapur",
+        badgeName: "Jagoan Dapur Lestari",
+        badgeIcon: "🍳",
+        badgeDesc: "Paham cara merawat kulkas dan peralatan dapur agar hemat energi.",
+        description: "Mari menjelajahi area dapur! Cari tahu rahasia kulkas pintar, dispenser air, dan peralatan rumah tangga lainnya.",
+        questions: [
+          {
+            category: "Membuka Pintu Kulkas Terlalu Lama",
+            image: "Zona 3/soal1.jpeg",
+            caption: "Kamu berdiri di depan kulkas terbuka lebar sambil bingung mau ambil minum apa.",
+            question: "Kenapa kita tidak boleh membuka pintu kulkas terlalu lama?",
+            options: [
+              "Udara dingin di dalam kulkas keluar, membuat mesin kulkas bekerja keras dan boros listrik",
+              "Makanan di dalam kulkas akan berubah menjadi es krim rasa stroberi",
+              "Lampu kulkas akan meledak karena kehabisan tenaga",
+              "Kulkas akan berjalan sendiri mengelilingi dapur"
+            ],
+            answer: 0,
+            fact: "Membuka kulkas terlalu lama membuang hawa dingin dan memaksa mesin pendingin menyedot daya listrik lebih banyak.",
+            actionTip: "Tentukan dulu apa yang ingin diambil sebelum membuka pintu kulkas!"
+          },
+          {
+            category: "Makanan Panas Masuk Kulkas",
+            image: "Zona 3/soal2.jpeg",
+            caption: "Ibu memasukkan sup panas yang baru mendidih langsung ke dalam rak kulkas.",
+            question: "Apa yang terjadi jika makanan yang masih sangat panas langsung dimasukkan ke kulkas?",
+            options: [
+              "Kulkas butuh tenaga ekstra dingin untuk menurunkan suhunya sehingga boros listrik",
+              "Makanan tersebut akan berubah menjadi batu permata yang indah",
+              "Kulkas akan langsung berbunyi alarm kebakaran",
+              "Semua piring di dapur akan melayang"
+            ],
+            answer: 0,
+            fact: "Makanan panas menaikkan suhu di dalam kulkas, sehingga mesin harus bekerja jauh lebih keras.",
+            actionTip: "Tunggu makanan hingga dingin di suhu ruangan dulu sebelum disimpan ke dalam kulkas ya."
+          },
+          {
+            category: "Dispenser Air Minum",
+           image: "Zona 3/soal3.jpeg",
+            caption: "Dispenser air panas dan dingin di rumah menyala terus sepanjang hari.",
+            question: "Bagaimana cara menghemat listrik dari dispenser air minum saat malam hari atau saat rumah kosong?",
+            options: [
+              "Mematikan tombol pemanas air di belakang dispenser jika tidak sedang digunakan",
+              "Mencabut seluruh dinding rumah dari fondasinya",
+              "Memasukkan es batu ke dalam kabel dispenser",
+              "Membiarkan sakelar menyala tanpa pernah dibersihkan"
+            ],
+            answer: 0,
+            fact: "Pemanas air (heater) pada dispenser terus menerus menyala untuk menjaga air tetap panas, yang memakan cukup banyak listrik.",
+            actionTip: "Matikan tombol pemanas air pada dispenser saat malam hari menjelang tidur."
+          },
+          {
+            category: "Menyetrika Pakaian",
+            image: "Zona 3/soal4.jpeg",
+            caption: "Menyetrika baju satu persatu setiap kali ada pakaian yang mau dipakai.",
+            question: "Cara paling hemat listrik saat menggunakan setrika adalah...",
+            options: [
+              "Menyetrika pakaian sekaligus dalam jumlah banyak dalam sekali waktu",
+              "Menyalakan setrika selama 24 jam penuh agar selalu siap panas",
+              "Menyetrika pakaian sambil menyiramnya dengan air es",
+              "Menggunakan setrika dengan tenaga angin mainan"
+            ],
+            answer: 0,
+            fact: "Proses pemanasan awal (pre-heating) setrika membutuhkan daya listrik yang besar. Menyetrika sekaligus jauh lebih hemat!",
+            actionTip: "Kumpulkan baju yang sudah dicuci dan setrika sekaligus agar listrik lebih hemat."
+          }
+        ]
+      },
+      {
+        id: "zone4",
+        number: 4,
+        title: "Sekolah & Perjalanan",
+        subtitle: "Zona Sekolah & Sekitar",
+        icon: "🏫",
+        coverImage: "Foto/Banner4.jpg",
+        badgeId: "badge_sekolah",
+        badgeName: "Pahlawan Bumi Sejati",
+        badgeIcon: "🏫",
+        badgeDesc: "Master Eco Cilik yang menjaga kelestarian lingkungan di sekolah dan perjalanan.",
+        description: "Jelajahi cara hemat energi di ruang kelas, membawa tumbler, dan melakukan aksi hijau saat di sekolah maupun perjalanan.",
+        questions: [
+          {
+            category: "Lampu Kelas saat Istirahat",
+            image: "Zona 4/soal1.jpeg",
+            caption: "Semua murid keluar kelas untuk istirahat bermain di halaman, tapi lampu dan kipas kelas menyala.",
+            question: "Sebagai murid kelas 5 yang hebat, apa yang harus kamu lakukan?",
+            options: [
+              "Mematikan lampu dan kipas angin kelas sebelum ikut keluar bermain",
+              "Membiarkannya menyala agar hantu kelas tidak kepanasan",
+              "Menyuruh adik kelas 1 untuk menjaganya",
+              "Menaikkan meja ke atas kursi agar dekat dengan lampu"
+            ],
+            answer: 0,
+            fact: "Ruang kelas yang kosong saat jam istirahat tidak butuh penerangan atau kipas angin. Mematikannya adalah aksi pahlawan cilik!",
+            actionTip: "Jadilah petugas piket yang teliti dalam menghemat energi di kelas."
+          },
+          {
+            category: "Membawa Tumbler (Botol Minum)",
+            image: "Zona 4/soal2.jpeg",
+            caption: "Membawa botol minum (tumbler) sendiri dari rumah ke sekolah setiap hari.",
+            question: "Apa keuntungan besar membawa tumbler dibanding membeli air botol plastik sekali pakai?",
+            options: [
+              "Mengurangi sampah plastik yang bisa merusak lingkungan dan lautan",
+              "Membuat berat tas sekolahmu bertambah 10 kilogram",
+              "Supaya botolmu bisa terbang jika ditiup angin",
+              "Agar air minummu berubah rasa menjadi manis"
+            ],
+            answer: 0,
+            fact: "Sampah botol plastik butuh ratusan tahun untuk hancur di bumi. Membawa tumbler adalah cara pahlawan menjaga bumi!",
+            actionTip: "Selalu isi penuh tumbler-mu di rumah sebelum berangkat ke sekolah ya."
+          },
+          {
+            category: "Sampah Sisa Makanan",
+            image: "Zona 4/soal3.jpeg",
+            caption: "Membeli makanan di kantin sekolah tapi disisakan banyak hingga terbuang ke tempat sampah.",
+            question: "Mengapa membuang-buang makanan (food waste) tidak baik untuk bumi kita?",
+            options: [
+              "Makanan yang menumpuk busuk di tempat sampah mengeluarkan gas rumah kaca yang merusak iklim",
+              "Karena makanan sisa bisa berubah menjadi burung merpati",
+              "Karena piring kantin akan marah jika makanannya tidak habis",
+              "Karena sisa makanan bisa menyalakan lampu jalanan"
+            ],
+            answer: 0,
+            fact: "Mengambil makanan secukupnya dan menghabiskannya adalah cara sederhana menyelamatkan bumi dari krisis iklim.",
+            actionTip: "Ambil porsi makan secukupnya saja sesuai rasa lapar kalian!"
+          },
+          {
+            category: "Berjalan Kaki ke Sekolah",
+            image: "Zona 4/soal4.jpeg",
+            caption: "Jarak rumah ke sekolah sangat dekat (hanya 5 menit), bisa ditempuh dengan jalan kaki atau bersepeda.",
+            question: "Apa kehebatan dari berjalan kaki atau naik sepeda ke sekolah untuk jarak dekat?",
+            options: [
+              "Menyehatkan badan sekaligus mengurangi polusi udara dari asap kendaraan",
+              "Membuat sepatu sekolahmu cepat rusak dan jebol",
+              "Membuat matahari bersinar lebih terik dari biasanya",
+              "Membuat waktu berjalan mundur ke masa lalu"
+            ],
+            answer: 0,
+            fact: "Kendaraan bermotor menghasilkan gas buang (asap) yang membuat udara kotor. Jalan kaki atau bersepeda sangat ramah lingkungan!",
+            actionTip: "Jika jaraknya dekat dan aman, yuk ajak teman-teman berjalan kaki atau naik sepeda ke sekolah!"
+          }
+        ]
+      },
+      {
+        id: "zone5",
+        number: 5,
+        title: "Kamar Mandi & Tempat Cuci",
+        subtitle: "Zona Hemat Air",
+        icon: "🛁",
+        coverImage: "Foto/Banner5.jpeg",
+        badgeId: "badge_air",
+        badgeName: "Pahlawan Air",
+        badgeIcon: "💧",
+        badgeDesc: "Jago menghemat air dan listrik di kamar mandi serta tempat cuci.",
+        description: "Air dan listrik sering terbuang di sini! Cari tahu cara mandi, mencuci, dan menyetrika dengan hemat.",
+        questions: [
+          {
+            category: "Menyikat Gigi",
+            image: "Zona 5/soal1.jpeg",
+            caption: "Kamu sedang menyikat gigi dan keran air masih terbuka.",
+            question: "Saat menyikat gigi, cara paling hemat air adalah...",
+            options: [
+              "Membiarkan keran mengalir terus",
+              "Menutup keran dan memakai gelas untuk berkumur",
+              "Menyikat gigi di bawah shower",
+              "Menyikat gigi sambil mengisi bak"
+            ],
+            answer: 1,
+            fact: "Keran yang dibiarkan menyala bisa membuang banyak liter air dalam sekali menyikat gigi.",
+            actionTip: "Tutup keran saat menyikat gigi dan gunakan gelas untuk berkumur."
+          },
+          {
+            category: "Menggunakan Mesin Cuci",
+            image: "Zona 5/soal2.jpeg",
+            caption: "Mesin cuci akan digunakan untuk mencuci pakaian kotor.",
+            question: "Kapan waktu terbaik menggunakan mesin cuci agar hemat listrik dan air?",
+            options: [
+              "Setiap kali ada 1 baju kotor",
+              "Saat cucian sudah penuh sesuai kapasitas",
+              "Hanya saat malam hari",
+              "Dua kali sehari"
+            ],
+            answer: 1,
+            fact: "Mencuci dalam jumlah penuh lebih efisien daripada mencuci sedikit berkali-kali.",
+            actionTip: "Tunggu sampai cucian cukup banyak, tetapi jangan melebihi kapasitas mesin."
+          },
+          {
+            category: "Menyetrika Pakaian",
+            image: "Zona 5/soal3.jpeg",
+            caption: "Kamu baru saja selesai menyetrika pakaian.",
+            question: "Apa yang sebaiknya dilakukan setelah selesai menyetrika?",
+            options: [
+              "Membiarkan setrika tetap menyala",
+              "Mencabut kabel dari stopkontak",
+              "Menutup setrika dengan kain",
+              "Menyiram setrika dengan air"
+            ],
+            answer: 1,
+            fact: "Setrika yang masih tersambung bisa memboroskan listrik dan berbahaya.",
+            actionTip: "Matikan setrika dan cabut kabelnya setelah selesai digunakan."
+          },
+          {
+            category: "Keran Air Menetes",
+            image: "Zona 5/soal4.jpeg",
+            caption: "Keran kamar mandi menetes terus walau aliran airnya pelan.",
+            question: "Keran di kamar mandi menetes terus walau pelan. Apa yang harus kamu lakukan?",
+            options: [
+              "Dibiarkan saja, hanya sedikit",
+              "Melapor ke orang tua agar segera diperbaiki",
+              "Menaruh ember lalu mengabaikannya",
+              "Menutup pintu kamar mandi"
+            ],
+            answer: 1,
+            fact: "Tetesan kecil yang berlangsung seharian bisa menghabiskan banyak air.",
+            actionTip: "Segera beri tahu orang tua agar keran yang bocor bisa diperbaiki."
+          }
+        ]
+      },
+      {
+        id: "zone6",
+        number: 6,
+        title: "Teras, Taman & Halaman",
+        subtitle: "Zona Taman Hijau",
+        icon: "🌳",
+        coverImage: "Foto/Banner6.jpeg",
+        badgeId: "badge_taman",
+        badgeName: "Penjaga Taman",
+        badgeIcon: "🌳",
+        badgeDesc: "Pandai merawat tanaman dan menjaga lingkungan halaman tetap hijau.",
+        description: "Saatnya berpetualang di luar rumah! Pelajari cahaya matahari, air hujan, dan tanaman untuk bumi yang lebih hijau.",
+        questions: [
+          {
+            category: "Menyiram Tanaman",
+            image: "Zona 6/soal1.jpeg",
+            caption: "Tanaman di halaman perlu disiram agar tetap tumbuh subur.",
+            question: "Kapan waktu terbaik menyiram tanaman agar air tidak cepat menguap?",
+            options: [
+              "Tengah hari saat terik",
+              "Pagi atau sore hari",
+              "Tengah malam",
+              "Kapan saja sama saja"
+            ],
+            answer: 1,
+            fact: "Pagi dan sore suhu lebih sejuk, sehingga air meresap ke tanah, bukan menguap.",
+            actionTip: "Siram tanaman pada pagi atau sore hari supaya air tidak cepat menguap."
+          },
+          {
+            category: "Memanfaatkan Air Hujan",
+            image: "Zona 6/soal2.jpeg",
+            caption: "Air hujan bisa ditampung untuk membantu kebutuhan di rumah.",
+            question: "Air hujan yang ditampung dalam bak bisa dipakai untuk...",
+            options: [
+              "Diminum langsung",
+              "Menyiram tanaman dan mencuci kendaraan",
+              "Mengisi baterai",
+              "Menyalakan lampu"
+            ],
+            answer: 1,
+            fact: "Menampung air hujan mengurangi pemakaian air bersih.",
+            actionTip: "Gunakan air hujan yang tertampung untuk menyiram tanaman atau mencuci kendaraan."
+          },
+          {
+            category: "Lampu Teras",
+            image: "Zona 6/soal3.jpeg",
+            caption: "Lampu teras masih menyala walau matahari sedang terang.",
+            question: "Lampu teras menyala sepanjang hari padahal matahari terang. Cara hemat yang tepat adalah...",
+            options: [
+              "Menambah lampu lagi",
+              "Mematikannya, atau memakai sensor cahaya otomatis",
+              "Menutupinya dengan kain",
+              "Mengganti dengan lampu lebih besar"
+            ],
+            answer: 1,
+            fact: "Sensor cahaya menyalakan lampu hanya saat gelap, jadi listrik tidak terbuang.",
+            actionTip: "Matikan lampu saat hari terang atau gunakan sensor cahaya otomatis."
+          },
+          {
+            category: "Sampah Organik",
+            image: "Zona 6/soal4.jpeg",
+            caption: "Ada sisa kulit buah dan daun kering di halaman rumah.",
+            question: "Sisa kulit buah dan daun kering di halaman sebaiknya...",
+            options: [
+              "Dibakar semuanya",
+              "Dijadikan kompos untuk pupuk tanaman",
+              "Dibuang ke selokan",
+              "Dimasukkan ke kantong plastik lalu dibuang"
+            ],
+            answer: 1,
+            fact: "Kompos mengurangi sampah dan menyuburkan tanah secara alami.",
+            actionTip: "Kumpulkan sampah organik untuk dibuat menjadi kompos."
+          }
+        ]
+      },
+      {
+        id: "zone7",
+        number: 7,
+        title: "Pasar & Belanja Hijau",
+        subtitle: "Zona Belanja Cerdas",
+        icon: "🛒",
+        coverImage: "Foto/Banner7.jpeg",
+        badgeId: "badge_belanja",
+        badgeName: "Pembelanja Cerdas",
+        badgeIcon: "🛒",
+        badgeDesc: "Cermat memilih barang dan mengurangi sampah saat berbelanja.",
+        description: "Belanja pun bisa menyelamatkan bumi! Temukan trik cerdas mengurangi sampah dan jejak energi dari makanan.",
+        questions: [
+          {
+            category: "Tas Belanja Pakai Ulang",
+            image: "Zona 7/soal1.jpeg",
+            caption: "Kamu akan pergi ke pasar untuk berbelanja.",
+            question: "Pergi ke pasar, sebaiknya kamu membawa...",
+            options: [
+              "Banyak kantong plastik baru",
+              "Tas belanja yang bisa dipakai berulang kali",
+              "Kardus besar sekali pakai",
+              "Tidak membawa apa-apa"
+            ],
+            answer: 1,
+            fact: "Tas kain atau keranjang bisa dipakai ratusan kali sehingga mengurangi sampah plastik.",
+            actionTip: "Bawa tas kain atau keranjang sendiri setiap kali berbelanja."
+          },
+          {
+            category: "Makanan dari Petani Sekitar",
+            image: "Zona 7/soal2.jpeg",
+            caption: "Sayur dan buah bisa dibeli dari petani di sekitar tempat tinggalmu.",
+            question: "Mengapa membeli sayur dan buah dari petani sekitar lebih ramah lingkungan?",
+            options: [
+              "Karena warnanya lebih cantik",
+              "Karena perjalanan pengirimannya pendek, jadi hemat bahan bakar",
+              "Karena harganya selalu gratis",
+              "Karena tidak perlu dicuci"
+            ],
+            answer: 1,
+            fact: "Makin dekat asal makanan, makin sedikit energi untuk transportasi dan pendinginan.",
+            actionTip: "Pilih hasil bumi lokal jika tersedia."
+          },
+          {
+            category: "Memilih Kemasan",
+            image: "Zona 7/soal3.jpeg",
+            caption: "Perhatikan jumlah kemasan sebelum memilih barang belanjaan.",
+            question: "Manakah pilihan kemasan yang paling baik untuk bumi?",
+            options: [
+              "Kemasan plastik berlapis-lapis",
+              "Produk dengan kemasan sedikit atau bisa diisi ulang",
+              "Setiap buah dibungkus sendiri-sendiri",
+              "Kemasan sekali pakai ukuran mini"
+            ],
+            answer: 1,
+            fact: "Kemasan yang lebih sedikit berarti lebih sedikit sampah dan energi produksi.",
+            actionTip: "Pilih produk dengan kemasan minim atau kemasan isi ulang."
+          },
+          {
+            category: "Daftar Belanja",
+            image: "Zona 7/soal4.jpeg",
+            caption: "Rencanakan barang yang akan dibeli sebelum pergi ke pasar.",
+            question: "Sebelum berbelanja, langkah cerdas yang bisa dilakukan adalah...",
+            options: [
+              "Membeli semua yang terlihat menarik",
+              "Membuat daftar belanja agar tidak membeli berlebihan",
+              "Membeli dua kali lipat untuk persediaan",
+              "Berbelanja tanpa rencana"
+            ],
+            answer: 1,
+            fact: "Daftar belanja mencegah makanan basi dan terbuang.",
+            actionTip: "Buat daftar belanja dan beli sesuai kebutuhan."
+          }
+        ]
+      },
+      {
+        id: "zone8",
+        number: 8,
+        title: "Kota Masa Depan",
+        subtitle: "Zona Final: Kota Masa Depan",
+        icon: "🌍",
+        coverImage: "Foto/Banner8.jpeg",
+        badgeId: "badge_penjaga_bumi",
+        badgeName: "Penjaga Bumi Sejati",
+        badgeIcon: "🌍",
+        badgeDesc: "Penjaga Bumi sejati yang memahami energi bersih dan mengajak sesama menjaga lingkungan.",
+        description: "Tantangan terakhir! Kenali energi bersih dan jadilah Penjaga Bumi sejati untuk kota dan dunia.",
+        questions: [
+          {
+            category: "Energi Terbarukan",
+            image: "Zona 8/soal1.jpeg",
+            caption: "Matahari dan angin bisa dimanfaatkan untuk menghasilkan energi.",
+            question: "Manakah yang termasuk sumber energi terbarukan?",
+            options: [
+              "Batu bara",
+              "Minyak bumi",
+              "Sinar matahari dan angin",
+              "Gas alam"
+            ],
+            answer: 2,
+            fact: "Matahari dan angin tidak akan habis dan tidak menghasilkan banyak polusi.",
+            actionTip: "Dukung penggunaan sumber energi bersih seperti matahari dan angin."
+          },
+          {
+            category: "Panel Surya",
+            image: "Zona 8/soal2.jpeg",
+            caption: "Panel surya dapat dipasang di atap rumah untuk memanfaatkan cahaya matahari.",
+            question: "Panel surya di atap rumah berfungsi untuk...",
+            options: [
+              "Menampung air hujan",
+              "Mengubah sinar matahari menjadi listrik",
+              "Mendinginkan ruangan",
+              "Menangkap angin"
+            ],
+            answer: 1,
+            fact: "Panel surya mengubah cahaya matahari menjadi energi listrik yang bersih.",
+            actionTip: "Panel surya menghasilkan listrik dengan memanfaatkan cahaya matahari."
+          },
+          {
+            category: "Angkutan Umum",
+            image: "Zona 8/soal3.jpeg",
+            caption: "Bus dan kereta bisa mengangkut banyak orang dalam satu perjalanan.",
+            question: "Mengapa naik bus, kereta, atau angkutan umum lebih hemat energi?",
+            options: [
+              "Karena lebih cepat selalu",
+              "Karena satu kendaraan mengangkut banyak orang sekaligus",
+              "Karena tidak butuh bahan bakar",
+              "Karena jalannya lebih pendek"
+            ],
+            answer: 1,
+            fact: "Banyak penumpang dalam satu kendaraan berarti lebih sedikit kendaraan di jalan dan lebih sedikit polusi.",
+            actionTip: "Gunakan angkutan umum jika memungkinkan dan sesuai kebutuhan."
+          },
+          {
+            category: "Aksi Penjaga Bumi",
+            image: "Zona 8/soal4.jpeg",
+            caption: "Kebiasaan baikmu bisa mengajak keluarga dan teman ikut menjaga bumi.",
+            question: "Apa tindakan paling nyata yang bisa kamu lakukan sebagai Penjaga Bumi?",
+            options: [
+              "Menunggu orang dewasa saja yang bertindak",
+              "Memulai kebiasaan hemat energi dan mengajak keluarga serta teman",
+              "Menganggap satu orang tidak berpengaruh",
+              "Hanya berhemat saat ada yang melihat"
+            ],
+            answer: 1,
+            fact: "Kebiasaan hemat energi dan ajakan kepada orang lain dapat memberi dampak nyata.",
+            actionTip: "Mulai dari kebiasaan baikmu sendiri dan ajak keluarga serta teman."
+          }
+        ]
+      }
+    ];
+
+    const MAX_GLOBAL_XP = ZONES_DATA.length * 250;
+    const XP_PER_TITLE = MAX_GLOBAL_XP / 4;
+    const TITLES_LADDER = [
+      { name: "Penjelajah Cilik", icon: "🌱", minXP: 0, maxXP: XP_PER_TITLE - 1 },
+      { name: "Pengawal Energi", icon: "🛡️", minXP: XP_PER_TITLE, maxXP: XP_PER_TITLE * 2 - 1 },
+      { name: "Jagoan Hijau", icon: "🌿", minXP: XP_PER_TITLE * 2, maxXP: XP_PER_TITLE * 3 - 1 },
+      { name: "Pahlawan Bumi", icon: "🌍", minXP: XP_PER_TITLE * 3, maxXP: MAX_GLOBAL_XP - 1 },
+      { name: "Master Eco Cilik", icon: "⚡👑", minXP: MAX_GLOBAL_XP, maxXP: 99999 }
+    ];
+
+    /* =====================================================================
+       2. PERSISTENCE & USER STATE INITIALIZATION
+       ===================================================================== */
+    const STORAGE_KEY = "ecoquiz_kids_kelas5_savedata";
+
+    let gameState = {
+      totalXP: 0,
+      currentTitleIndex: 0,
+      unlockedZones: ["zone1"],
+      completedZones: {},
+      badges: [],
+      puzzlePieces: []
+    };
+
+    function loadSavedState() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          gameState = { ...gameState, ...parsed };
+        }
+      } catch (e) {
+        console.warn("Gagal memuat save state:", e);
+      }
+      if (!Array.isArray(gameState.puzzlePieces)) {
+        gameState.puzzlePieces = [];
+      }
+      if (!Array.isArray(gameState.unlockedZones)) {
+        gameState.unlockedZones = ["zone1"];
+      }
+      ZONES_DATA.forEach((zone, index) => {
+        const nextZone = ZONES_DATA[index + 1];
+        if (gameState.completedZones[zone.id] && nextZone && !gameState.unlockedZones.includes(nextZone.id)) {
+          gameState.unlockedZones.push(nextZone.id);
+        }
+      });
+      updateAccountDisplay();
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(gameState));
+      } catch (e) {
+        console.warn("Gagal menyimpan save state:", e);
+      }
+      updateAccountDisplay();
+    }
+
+    function resetGameState() {
+      if (confirm("Yakin ingin mengulang petualangan dari awal, Pahlawan?")) {
+        gameState = {
+          totalXP: 0,
+          currentTitleIndex: 0,
+          unlockedZones: ["zone1"],
+          completedZones: {},
+          badges: [],
+          puzzlePieces: []
+        };
+        saveState();
+        renderCampaignMap();
+        returnToMap();
+        playSound('click');
+      }
+    }
+
+    /* =====================================================================
+       3. AUDIO SYNTHESIZER (WEB AUDIO API)
+       ===================================================================== */
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const correctAnswerAudio = new Audio('./Backsound/benar.mp3');
+    correctAnswerAudio.preload = 'auto';
+    const wrongAnswerAudio = new Audio('./Backsound/salah2.mp3');
+    wrongAnswerAudio.preload = 'auto';
+    const MUSIC_MELODY = [
+      523.25, 659.25, 783.99, 659.25,
+      587.33, 698.46, 880, 698.46,
+      523.25, 659.25, 783.99, 1046.5,
+      880, 783.99, 659.25, 587.33
+    ];
+    const MUSIC_BASS = [130.81, 98, 110, 87.31];
+    const MUSIC_STEP_MS = 320;
+    let musicStep = 0;
+    let musicInterval = null;
+    let isMusicPlaying = false;
+    let isMusicStarting = false;
+
+    function playSound(type) {
+      if (type === 'correct') {
+        correctAnswerAudio.currentTime = 0;
+        correctAnswerAudio.play().catch(error => {
+          console.error('Gagal memutar suara jawaban benar:', error);
+        });
+        return;
+      }
+      if (type === 'wrong') {
+        wrongAnswerAudio.currentTime = 0;
+        wrongAnswerAudio.play().catch(error => {
+          console.error('Gagal memutar suara jawaban salah:', error);
+        });
+        return;
+      }
+
+      try {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        const now = audioCtx.currentTime;
+
+        if (type === 'click') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(450, now);
+          gain.gain.setValueAtTime(0.06, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+          osc.start(now);
+          osc.stop(now + 0.05);
+        } else if (type === 'victory') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(523.25, now);
+          osc.frequency.setValueAtTime(659.25, now + 0.1);
+          osc.frequency.setValueAtTime(783.99, now + 0.2);
+          osc.frequency.setValueAtTime(1046.50, now + 0.3);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+          osc.start(now);
+          osc.stop(now + 0.5);
+        } else if (type === 'gameover') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(240, now);
+          osc.frequency.exponentialRampToValueAtTime(80, now + 0.6);
+          gain.gain.setValueAtTime(0.25, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+          osc.start(now);
+          osc.stop(now + 0.6);
+        }
+      } catch (e) {
+        // Audio error silent fallback
+      }
+    }
+
+    function playMusicNote(frequency, duration, volume, waveform) {
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = waveform;
+      osc.frequency.setValueAtTime(frequency, now);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(volume, now + 0.025);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.onended = () => {
+        osc.disconnect();
+        gain.disconnect();
+      };
+      osc.start(now);
+      osc.stop(now + duration);
+    }
+
+    function playMusicStep() {
+      playMusicNote(MUSIC_MELODY[musicStep], 0.28, 0.035, 'triangle');
+      if (musicStep % 4 === 0) {
+        playMusicNote(MUSIC_BASS[Math.floor(musicStep / 4)], 0.95, 0.025, 'sine');
+      }
+      musicStep = (musicStep + 1) % MUSIC_MELODY.length;
+    }
+
+    function updateMusicButton() {
+      const button = document.getElementById('btn-toggle-music');
+      const icon = document.getElementById('music-icon');
+      const status = document.getElementById('music-status');
+      button.setAttribute('aria-pressed', String(isMusicPlaying));
+      button.setAttribute('aria-label', isMusicPlaying ? 'Matikan musik latar' : 'Nyalakan musik latar');
+      button.title = isMusicPlaying ? 'Matikan musik latar' : 'Nyalakan musik latar';
+      icon.textContent = isMusicPlaying ? '🎵' : '🔇';
+      status.textContent = isMusicPlaying ? 'Musik Nyala' : 'Musik Mati';
+    }
+
+    async function toggleBackgroundMusic() {
+      if (isMusicPlaying) {
+        clearInterval(musicInterval);
+        musicInterval = null;
+        isMusicPlaying = false;
+        updateMusicButton();
+        return;
+      }
+      if (isMusicStarting) return;
+
+      isMusicStarting = true;
+      try {
+        await audioCtx.resume();
+        musicStep = 0;
+        isMusicPlaying = true;
+        updateMusicButton();
+        playMusicStep();
+        musicInterval = setInterval(playMusicStep, MUSIC_STEP_MS);
+      } catch (error) {
+        console.error('Gagal memutar musik latar:', error);
+      } finally {
+        isMusicStarting = false;
+      }
+    }
+
+    /* =====================================================================
+       4. ACCOUNT TITLE & LEVEL CALCULATION
+       ===================================================================== */
+    function getTitleForXP(xp) {
+      for (let i = TITLES_LADDER.length - 1; i >= 0; i--) {
+        if (xp >= TITLES_LADDER[i].minXP) {
+          return { current: TITLES_LADDER[i], next: TITLES_LADDER[i + 1] || null };
+        }
+      }
+      return { current: TITLES_LADDER[0], next: TITLES_LADDER[1] };
+    }
+
+    function updateAccountDisplay() {
+      const { current, next } = getTitleForXP(gameState.totalXP);
+      
+      document.getElementById('header-title-icon').textContent = current.icon;
+      document.getElementById('header-title-text').textContent = current.name;
+      document.getElementById('header-xp-text').textContent = `${gameState.totalXP} XP`;
+      document.getElementById('header-badge-count').textContent = `${gameState.badges.length}/${ZONES_DATA.length}`;
+
+      const progress = Math.max(0, Math.min(100, Math.round((gameState.totalXP / MAX_GLOBAL_XP) * 100)));
+
+      if (next) {
+        document.getElementById('next-title-name').textContent = `${next.name} (${next.minXP} XP)`;
+      } else {
+        document.getElementById('next-title-name').textContent = "Pangkat Maksimal (Master Eco Cilik)";
+      }
+
+      document.getElementById('xp-progress-percent').textContent = `${progress}%`;
+      document.getElementById('xp-progress-bar').style.width = `${progress}%`;
+      
+      // Update label batas bawah dan batas atas
+      document.getElementById('xp-current-info').textContent = `${gameState.totalXP} XP`;
+      document.getElementById('xp-next-target').textContent = `Max: ${MAX_GLOBAL_XP} XP`;
+
+      const completedCount = Object.keys(gameState.completedZones).length;
+      document.getElementById('overall-progress-text').textContent = `${completedCount} / ${ZONES_DATA.length} Zona`;
+    }
+
+    /* =====================================================================
+       5. CAMPAIGN MAP SCREEN RENDERING
+       ===================================================================== */
+    function renderCampaignMap() {
+      const container = document.getElementById('zones-container');
+      container.innerHTML = '';
+
+      ZONES_DATA.forEach((zone, idx) => {
+        const isUnlocked = gameState.unlockedZones.includes(zone.id);
+        const completion = gameState.completedZones[zone.id];
+        const isCompleted = !!completion;
+
+        const card = document.createElement('div');
+        card.className = `zone-card-enter rounded-3xl border-4 transition duration-200 overflow-hidden flex flex-col justify-between card-bubble cartoon-shadow-hover ${
+          isUnlocked 
+            ? 'bg-white border-emerald-300' 
+            : 'bg-slate-50 border-dashed border-slate-300 opacity-75'
+        }`;
+        card.style.animationDelay = `${Math.min(idx * 60, 420)}ms`;
+
+        let statusBadgeHTML = '';
+        if (isCompleted) {
+          statusBadgeHTML = `
+            <div class="flex items-center space-x-1.5 bg-emerald-100 text-emerald-900 border-2 border-emerald-300 px-3 py-1 rounded-full text-xs font-bold shadow-sm">
+              <span>✅ SELESAI</span>
+              <span>•</span>
+              <span class="text-amber-500">${'⭐'.repeat(completion.stars)}</span>
+            </div>
+          `;
+        } else if (isUnlocked) {
+          statusBadgeHTML = `
+            <div class="bg-amber-100 text-amber-900 border-2 border-amber-300 px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1 pulse-glow shadow-sm">
+              <span class="text-xs">▶️</span> <span>AYO MAIN</span>
+            </div>
+          `;
+        } else {
+          statusBadgeHTML = `
+            <div class="bg-amber-50 text-amber-800 border-2 border-amber-200 px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1 shadow-sm">
+              <span>🔒</span> <span>TERKUNCI</span>
+            </div>
+          `;
+        }
+
+        card.innerHTML = `
+          <div>
+            <div class="relative h-44 w-full overflow-hidden bg-slate-200 border-b-2 border-slate-100">
+              <img src="${zone.coverImage}" alt="${zone.title}" class="w-full h-full object-cover ${!isUnlocked ? 'filter grayscale contrast-75' : ''}">
+              <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent"></div>
+              
+              <div class="absolute top-3 left-3">
+                ${statusBadgeHTML}
+              </div>
+
+              <div class="absolute bottom-3 left-3 right-3 text-white">
+                <span class="text-[10px] font-bold text-amber-300 uppercase tracking-widest block font-sans-alt">ZONA 0${zone.number}</span>
+                <h4 class="font-bold text-lg leading-tight drop-shadow flex items-center space-x-1.5">
+                  <span>${zone.icon}</span> <span>${zone.title}</span>
+                </h4>
+              </div>
+            </div>
+
+            <div class="p-5 font-sans-alt">
+              <p class="text-xs text-slate-600 leading-relaxed mb-4 line-clamp-3 font-medium">
+                ${zone.description}
+              </p>
+
+              <div class="flex items-center justify-between text-[11px] font-bold text-slate-400 border-t-2 border-slate-100 pt-3">
+                <span class="flex items-center space-x-1 text-slate-600">
+                  <span>⭐</span> <span>${zone.questions.length} Pertanyaan</span>
+                </span>
+                <span class="flex items-center space-x-1 text-amber-600">
+                  <span>🎒</span> <span>1 Lencana</span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-5 pt-0">
+            ${isUnlocked ? `
+              <button onclick="startZone('${zone.id}')" class="w-full py-3.5 ${isCompleted ? 'bg-slate-900 hover:bg-slate-800' : 'bg-emerald-500 hover:bg-emerald-600'} text-white font-bold rounded-2xl transition text-xs flex items-center justify-center space-x-1.5 shadow-md border-2 border-emerald-600">
+                <span>${isCompleted ? 'Mainkan Lagi' : 'Mulai Misi Zona Ini ➔'}</span>
+              </button>
+            ` : `
+              <div class="w-full py-3.5 bg-slate-100 text-slate-500 font-bold rounded-2xl text-xs text-center border-2 border-slate-200 shadow-inner">
+                Selesaikan Zona Sebelumnya 🔒
+              </div>
+            `}
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+
+      renderPuzzleCollection();
+    }
+
+    function renderPuzzleCollection() {
+      const puzzlePieces = Array.isArray(gameState.puzzlePieces) ? gameState.puzzlePieces : [];
+      const puzzleGroups = [
+        { zones: ZONES_DATA.slice(0, 4), progressId: 'puzzle-progress-zones-1-4', title: 'Zona 1–4', image: 'Foto/Puzzle1.jpg' },
+        { zones: ZONES_DATA.slice(4, 8), progressId: 'puzzle-progress-zones-5-8', title: 'Zona 5–8', image: 'Foto/Puzzle2.jpg' }
+      ];
+      const positions = ['0% 0%', '100% 0%', '0% 100%', '100% 100%'];
+
+      puzzleGroups.forEach(group => {
+        const collectedCount = group.zones.filter(zone => puzzlePieces.includes(zone.id)).length;
+
+        group.zones.forEach((zone, index) => {
+          const piece = document.getElementById(`puzzle-piece-${zone.id}`);
+          const isCollected = puzzlePieces.includes(zone.id);
+          const label = piece.querySelector('span');
+
+          piece.style.backgroundImage = `url('${group.image}')`;
+          piece.style.backgroundSize = '200% 200%';
+          piece.style.backgroundPosition = positions[index];
+          piece.classList.toggle('grayscale', !isCollected);
+          piece.classList.toggle('opacity-40', !isCollected);
+          piece.classList.toggle('border-emerald-400', isCollected);
+          piece.classList.toggle('border-slate-200', !isCollected);
+          label.textContent = isCollected ? '' : `Zona ${zone.number} 🔒`;
+          piece.setAttribute(
+            'aria-label',
+            `Pecahan puzzle zona ${zone.number} ${isCollected ? 'sudah didapat' : 'belum didapat'}`
+          );
+        });
+
+        const progressText = document.getElementById(group.progressId);
+        progressText.textContent = collectedCount === group.zones.length
+          ? `Puzzle ${group.title} lengkap! 🌍`
+          : `${collectedCount}/${group.zones.length} pecahan terkumpul. Jawab semua soal dengan benar untuk mendapatkan pecahannya.`;
+      });
+    }
+
+    /* =====================================================================
+       6. ACTIVE QUIZ SESSION STATE & CONTROLLER
+       ===================================================================== */
+    let currentZone = null;
+    let currentQuestionIndex = 0;
+    let currentOptions = [];
+    let currentAnswerIndex = 0;
+    let zoneScore = 0;
+    let zoneXP = 0;
+    let lives = 3;
+    let timer = 25;
+    const maxTimer = 25;
+    let timerInterval = null;
+    let activeMultiplier = 1;
+
+    let lifelineUsed = { fifty: false, time: false, double: false };
+
+    function replayAnimation(element, animationClass) {
+      element.classList.remove(animationClass);
+      void element.offsetWidth;
+      element.classList.add(animationClass);
+    }
+
+    function startZone(zoneId) {
+      playSound('click');
+      currentZone = ZONES_DATA.find(z => z.id === zoneId);
+      if (!currentZone) return;
+
+      currentQuestionIndex = 0;
+      zoneScore = 0;
+      zoneXP = 0;
+      lives = 3;
+      activeMultiplier = 1;
+      lifelineUsed = { fifty: false, time: false, double: false };
+
+      document.getElementById('quiz-zone-badge').textContent = `ZONA ${currentZone.number}: ${currentZone.title.toUpperCase()}`;
+      document.getElementById('quiz-zone-title').textContent = currentZone.subtitle;
+      
+      resetLifelineButtons();
+      updateLivesDisplay();
+      updateScoreDisplay();
+
+      document.getElementById('screen-map').classList.add('hidden');
+      document.getElementById('screen-zone-result').classList.add('hidden');
+      const quizScreen = document.getElementById('screen-quiz');
+      quizScreen.classList.remove('hidden');
+      replayAnimation(quizScreen, 'screen-enter');
+
+      loadQuestion();
+    }
+
+    function returnToMap() {
+      playSound('click');
+      clearInterval(timerInterval);
+      document.getElementById('screen-quiz').classList.add('hidden');
+      document.getElementById('screen-zone-result').classList.add('hidden');
+      const mapScreen = document.getElementById('screen-map');
+      mapScreen.classList.remove('hidden');
+      replayAnimation(mapScreen, 'screen-enter');
+      renderCampaignMap();
+      updateAccountDisplay();
+    }
+
+    function resetLifelineButtons() {
+      const l50 = document.getElementById('lifeline-5050');
+      const lt = document.getElementById('lifeline-time');
+      const ld = document.getElementById('lifeline-double');
+
+      [l50, lt, ld].forEach(btn => {
+        btn.disabled = false;
+        btn.classList.remove('opacity-40', 'cursor-not-allowed', 'bg-slate-200');
+      });
+    }
+
+    function updateLivesDisplay() {
+      const container = document.getElementById('lives-container');
+      container.innerHTML = '';
+      for (let i = 0; i < 3; i++) {
+        const span = document.createElement('span');
+        span.className = 'heart-icon inline-block transition';
+        if (i < lives) {
+          span.textContent = '❤️';
+        } else {
+          span.textContent = '🖤';
+          span.classList.add('opacity-40');
+        }
+        container.appendChild(span);
+      }
+    }
+
+    function updateScoreDisplay() {
+      document.getElementById('quiz-score-display').textContent = zoneScore;
+      document.getElementById('quiz-question-number').textContent = `${currentQuestionIndex + 1}/${currentZone.questions.length}`;
+    }
+
+    function loadQuestion() {
+      clearInterval(timerInterval);
+      const q = currentZone.questions[currentQuestionIndex];
+      updateScoreDisplay();
+
+      if (activeMultiplier > 1) {
+        document.getElementById('quiz-multiplier-badge').classList.remove('hidden');
+      } else {
+        document.getElementById('quiz-multiplier-badge').classList.add('hidden');
+      }
+
+      document.getElementById('quiz-case-category').textContent = `Tantangan: ${q.category}`;
+      const imageContainer = document.getElementById('quiz-image-container');
+      imageContainer.classList.toggle('hidden', !q.image);
+      if (q.image) {
+        document.getElementById('quiz-image').src = q.image;
+      }
+      document.getElementById('quiz-image-caption').textContent = q.caption;
+      document.getElementById('quiz-question-title').textContent = q.question;
+      document.getElementById('host-dialogue-text').textContent = q.image
+        ? '"Perhatikan gambar di samping, pilih jawaban yang paling hebat dan bijak ya!"'
+        : '"Pilih jawaban yang paling hebat dan bijak ya!"';
+
+      const optionsContainer = document.getElementById('quiz-options-container');
+      optionsContainer.innerHTML = '';
+
+      const shuffledOptions = q.options.map((text, originalIndex) => ({
+        text,
+        isCorrect: originalIndex === q.answer
+      }));
+      for (let i = shuffledOptions.length - 1; i > 0; i--) {
+        const randomIndex = Math.floor(Math.random() * (i + 1));
+        [shuffledOptions[i], shuffledOptions[randomIndex]] = [shuffledOptions[randomIndex], shuffledOptions[i]];
+      }
+      currentOptions = shuffledOptions.map(option => option.text);
+      currentAnswerIndex = shuffledOptions.findIndex(option => option.isCorrect);
+
+      currentOptions.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = "w-full text-left p-4 rounded-2xl border-2 border-slate-200 bg-white hover:border-emerald-500 hover:bg-emerald-50/50 transition font-sans-alt font-semibold text-xs md:text-sm flex items-center justify-between group shadow-sm cartoon-shadow-hover";
+        btn.innerHTML = `
+          <div class="flex items-center space-x-3">
+            <span class="w-8 h-8 rounded-xl bg-slate-100 text-slate-900 border-2 border-slate-200 text-xs font-bold flex items-center justify-center transition group-hover:bg-emerald-500 group-hover:text-white group-hover:border-emerald-600 shadow-sm">
+              ${String.fromCharCode(65 + idx)}
+            </span>
+            <span class="leading-snug">${opt}</span>
+          </div>
+        `;
+        btn.onclick = () => submitAnswer(idx);
+        optionsContainer.appendChild(btn);
+      });
+
+      replayAnimation(document.getElementById('quiz-question-card'), 'question-enter');
+      startTimer();
+    }
+
+    function startTimer() {
+      timer = maxTimer;
+      const timerBar = document.getElementById('quiz-timer-bar');
+      const timerText = document.getElementById('quiz-timer-text');
+      
+      timerText.textContent = `${timer}s`;
+      timerBar.style.width = '100%';
+      timerBar.className = 'bg-emerald-500 h-full rounded-full transition-all duration-1000';
+
+      timerInterval = setInterval(() => {
+        timer--;
+        timerText.textContent = `${timer}s`;
+        const percentage = (timer / maxTimer) * 100;
+        timerBar.style.width = `${percentage}%`;
+
+        if (timer <= 7 && timer > 3) {
+          timerBar.className = 'bg-amber-500 h-full rounded-full transition-all duration-1000';
+        } else if (timer <= 3) {
+          timerBar.className = 'bg-rose-500 h-full rounded-full transition-all duration-1000';
+        }
+
+        if (timer <= 0) {
+          clearInterval(timerInterval);
+          submitAnswer(-1);
+        }
+      }, 1000);
+    }
+
+    function submitAnswer(selectedIndex) {
+      clearInterval(timerInterval);
+      const q = currentZone.questions[currentQuestionIndex];
+      const isCorrect = selectedIndex === currentAnswerIndex;
+
+      const buttons = document.querySelectorAll('#quiz-options-container button');
+      buttons.forEach((btn, idx) => {
+        btn.disabled = true;
+        btn.classList.add('cursor-not-allowed');
+
+        if (idx === currentAnswerIndex) {
+          btn.classList.remove('bg-white', 'hover:border-emerald-500');
+          btn.classList.add('bg-emerald-100', 'border-emerald-500', 'text-emerald-950', 'font-bold');
+        } else if (idx === selectedIndex && !isCorrect) {
+          btn.classList.remove('bg-white', 'hover:border-emerald-500');
+          btn.classList.add('bg-rose-100', 'border-rose-400', 'text-rose-950');
+        }
+      });
+
+      if (isCorrect) {
+        playSound('correct');
+        const points = (100 + (timer * 4)) * activeMultiplier;
+        
+        // 25 XP per jawaban benar, tanpa pengali agar total tetap sesuai batas global.
+        const xpEarned = 25; 
+        
+        zoneScore += points;
+        zoneXP += xpEarned;
+        
+        gameState.totalXP += xpEarned;
+        if (gameState.totalXP > MAX_GLOBAL_XP) gameState.totalXP = MAX_GLOBAL_XP;
+        saveState();
+
+        document.getElementById('host-dialogue-text').textContent = `"Wah, jawabanmu tepat sekali! Kamu memang anak hebat!"`;
+        showInsightModal(true, points, xpEarned, q);
+      } else {
+        playSound('wrong');
+        lives--;
+        updateLivesDisplay();
+        
+        const livesBox = document.getElementById('lives-container');
+        livesBox.classList.add('heart-shake');
+        setTimeout(() => livesBox.classList.remove('heart-shake'), 600);
+
+        document.getElementById('host-dialogue-text').textContent = `"Belum tepat, tapi tenang! Yuk pelajari faktanya bersama Kak Rian."`;
+        showInsightModal(false, 0, 0, q);
+      }
+
+      activeMultiplier = 1;
+      updateScoreDisplay();
+    }
+
+    function showInsightModal(isCorrect, points, xpEarned, q) {
+      const modal = document.getElementById('modal-insight');
+      const badgeIcon = document.getElementById('insight-badge-icon');
+      const statusTitle = document.getElementById('insight-status-title');
+      const statusSubtitle = document.getElementById('insight-status-subtitle');
+      const factText = document.getElementById('insight-fact-text');
+      const actionText = document.getElementById('insight-action-text');
+      const nextBtnText = document.getElementById('btn-next-question-text');
+
+      if (isCorrect) {
+        badgeIcon.textContent = "🎉";
+        badgeIcon.className = "w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center text-3xl font-bold shadow-sm";
+        statusTitle.textContent = "Jawabanmu Hebat!";
+        statusTitle.className = "font-bold text-lg leading-tight text-emerald-900";
+        statusSubtitle.textContent = `+${points} Poin  •  +${xpEarned} XP`;
+      } else {
+        badgeIcon.textContent = "💪";
+        badgeIcon.className = "w-14 h-14 rounded-2xl bg-rose-100 text-rose-800 flex items-center justify-center text-3xl font-bold shadow-sm";
+        statusTitle.textContent = lives > 0 ? "Kurang Tepat Sedikit!" : "Nyawamu Habis!";
+        statusTitle.className = "font-bold text-lg leading-tight text-rose-900";
+        statusSubtitle.textContent = `-1 Nyawa Tersisa (${lives} Nyawa)`;
+      }
+
+      factText.textContent = q.fact;
+      actionText.textContent = q.actionTip;
+
+      const isLastQuestion = currentQuestionIndex >= currentZone.questions.length - 1;
+      if (lives <= 0) {
+        nextBtnText.textContent = "Lihat Hasil Misi ➔";
+      } else if (isLastQuestion) {
+        nextBtnText.textContent = "Selesaikan Zona Ini ➔";
+      } else {
+        nextBtnText.textContent = "Lanjut ke Soal Berikutnya ➔";
+      }
+
+      setTimeout(() => {
+        modal.classList.remove('hidden');
+      }, 700);
+    }
+
+    document.getElementById('btn-next-question').onclick = () => {
+      playSound('click');
+      document.getElementById('modal-insight').classList.add('hidden');
+
+      if (lives <= 0) {
+        playSound('gameover');
+        document.getElementById('modal-gameover').classList.remove('hidden');
+        return;
+      }
+
+      currentQuestionIndex++;
+      if (currentQuestionIndex < currentZone.questions.length) {
+        loadQuestion();
+      } else {
+        completeCurrentZone();
+      }
+    };
+
+    /* =====================================================================
+       7. LIFELINES IMPLEMENTATION
+       ===================================================================== */
+    const l50Btn = document.getElementById('lifeline-5050');
+    const lTimeBtn = document.getElementById('lifeline-time');
+    const lDoubleBtn = document.getElementById('lifeline-double');
+
+    l50Btn.onclick = () => {
+      if (lifelineUsed.fifty) return;
+      lifelineUsed.fifty = true;
+      l50Btn.disabled = true;
+      l50Btn.classList.add('opacity-40', 'cursor-not-allowed', 'bg-slate-200');
+      playSound('click');
+
+      const wrongIndices = currentOptions
+        .map((_, index) => index)
+        .filter(index => index !== currentAnswerIndex);
+      wrongIndices.sort(() => Math.random() - 0.5);
+      const toHide = wrongIndices.slice(0, 2);
+
+      const buttons = document.querySelectorAll('#quiz-options-container button');
+      toHide.forEach(idx => {
+        buttons[idx].style.visibility = 'hidden';
+      });
+      document.getElementById('host-dialogue-text').textContent = `"Bantuan 50:50 aktif! Dua jawaban salah sudah disingkirkan."`;
+    };
+
+    lTimeBtn.onclick = () => {
+      if (lifelineUsed.time) return;
+      lifelineUsed.time = true;
+      lTimeBtn.disabled = true;
+      lTimeBtn.classList.add('opacity-40', 'cursor-not-allowed', 'bg-slate-200');
+      playSound('click');
+
+      timer = Math.min(timer + 10, maxTimer);
+      document.getElementById('quiz-timer-text').textContent = `${timer}s`;
+      document.getElementById('host-dialogue-text').textContent = `"Waktu ditambah 10 detik! Pikirkan baik-baik ya."`;
+    };
+
+    lDoubleBtn.onclick = () => {
+      if (lifelineUsed.double) return;
+      lifelineUsed.double = true;
+      lDoubleBtn.disabled = true;
+      lDoubleBtn.classList.add('opacity-40', 'cursor-not-allowed', 'bg-slate-200');
+      playSound('click');
+
+      activeMultiplier = 2;
+      document.getElementById('quiz-multiplier-badge').classList.remove('hidden');
+      document.getElementById('host-dialogue-text').textContent = `"Hore! Poin 2x lipat aktif untuk soal ini!"`;
+    };
+
+    /* =====================================================================
+       8. GAME OVER & ZONE RETRY LOGIC
+       ===================================================================== */
+    document.getElementById('btn-retry-zone').onclick = () => {
+      document.getElementById('modal-gameover').classList.add('hidden');
+      startZone(currentZone.id);
+    };
+
+    function closeGameOverAndReturnMap() {
+      document.getElementById('modal-gameover').classList.add('hidden');
+      returnToMap();
+    }
+
+    /* =====================================================================
+       9. ZONE COMPLETION & BADGE UNLOCKING
+       ===================================================================== */
+    function completeCurrentZone() {
+      playSound('victory');
+      clearInterval(timerInterval);
+
+      document.getElementById('screen-quiz').classList.add('hidden');
+      const resultScreen = document.getElementById('screen-zone-result');
+      resultScreen.classList.remove('hidden');
+      replayAnimation(resultScreen, 'screen-enter');
+
+      let stars = 1;
+      if (lives === 3) stars = 3;
+      else if (lives === 2) stars = 2;
+
+      // Maksimal 250 XP per zona: 4 jawaban benar (100 XP) + bonus 150 XP.
+      const zoneClearBonusXP = 50 * stars;
+      
+      // Hitung selisih jika ini adalah permainan ulangan
+      const prevCompletion = gameState.completedZones[currentZone.id];
+      const alreadyHasPuzzlePiece = gameState.puzzlePieces.includes(currentZone.id);
+      const earnedPuzzlePiece = lives === 3 && !alreadyHasPuzzlePiece;
+      if (earnedPuzzlePiece) {
+        gameState.puzzlePieces.push(currentZone.id);
+      }
+
+      if (!prevCompletion) {
+        // Baru pertama kali menamatkan
+        gameState.totalXP += zoneClearBonusXP;
+      }
+      
+      if (!prevCompletion || prevCompletion.stars < stars || prevCompletion.score < zoneScore) {
+        gameState.completedZones[currentZone.id] = { stars: stars, score: zoneScore };
+      }
+
+      if (gameState.totalXP > MAX_GLOBAL_XP) gameState.totalXP = MAX_GLOBAL_XP;
+
+      const currentZoneIndex = ZONES_DATA.findIndex(z => z.id === currentZone.id);
+      let nextZone = null;
+      if (currentZoneIndex + 1 < ZONES_DATA.length) {
+        nextZone = ZONES_DATA[currentZoneIndex + 1];
+        if (!gameState.unlockedZones.includes(nextZone.id)) {
+          gameState.unlockedZones.push(nextZone.id);
+        }
+      }
+
+      let newlyUnlockedBadge = false;
+      if (!gameState.badges.includes(currentZone.badgeId)) {
+        gameState.badges.push(currentZone.badgeId);
+        newlyUnlockedBadge = true;
+      }
+
+      saveState();
+
+      document.getElementById('zone-result-title').textContent = `Yey! Kamu Menyelesaikan Zona ${currentZone.number}`;
+      document.getElementById('zone-result-desc').textContent = `Kamu hebat sekali menjaga energi di ${currentZone.title}!`;
+      document.getElementById('zone-res-score').textContent = zoneScore;
+      document.getElementById('zone-res-xp').textContent = `+${zoneXP + (prevCompletion ? 0 : zoneClearBonusXP)} XP`;
+      document.getElementById('zone-res-lives').textContent = '❤️'.repeat(lives);
+
+      const starIcons = '⭐'.repeat(stars) + '☆'.repeat(3 - stars);
+      document.getElementById('zone-result-stars').textContent = starIcons;
+
+      const badgeBox = document.getElementById('zone-new-badge-box');
+      if (newlyUnlockedBadge) {
+        badgeBox.classList.remove('hidden');
+        document.getElementById('new-badge-icon').textContent = currentZone.badgeIcon;
+        document.getElementById('new-badge-name').textContent = currentZone.badgeName;
+        document.getElementById('new-badge-desc').textContent = currentZone.badgeDesc;
+      } else {
+        badgeBox.classList.add('hidden');
+      }
+
+      const puzzleRewardBox = document.getElementById('zone-puzzle-reward-box');
+      const hasPuzzlePiece = alreadyHasPuzzlePiece || earnedPuzzlePiece;
+      puzzleRewardBox.className = `bg-gradient-to-r ${
+        hasPuzzlePiece ? 'from-emerald-50 to-teal-50 border-emerald-300' : 'from-amber-50 to-orange-50 border-amber-300'
+      } border-2 rounded-2xl p-4 mb-6 text-center`;
+      if (hasPuzzlePiece) {
+        document.getElementById('zone-puzzle-reward-icon').textContent = earnedPuzzlePiece ? '🧩' : '✅';
+        document.getElementById('zone-puzzle-reward-title').textContent = earnedPuzzlePiece
+          ? 'Pecahan Puzzle Zona Didapat!'
+          : 'Zona Ini Sudah Menyumbang Pecahan Puzzle!';
+        document.getElementById('zone-puzzle-reward-desc').textContent = earnedPuzzlePiece
+          ? `Keren! Pecahan Zona ${currentZone.number} sudah masuk ke koleksi puzzle di peta.`
+          : `Pecahan Zona ${currentZone.number} sudah kamu kumpulkan sebelumnya.`;
+      } else {
+        document.getElementById('zone-puzzle-reward-icon').textContent = '💡';
+        document.getElementById('zone-puzzle-reward-title').textContent = 'Belum Mendapat Pecahan Puzzle';
+        document.getElementById('zone-puzzle-reward-desc').textContent = 'Jawab semua soal zona ini dengan benar tanpa salah, lalu coba lagi untuk mendapatkan pecahan puzzle.';
+      }
+
+      const allCompleted = ZONES_DATA.every(z => gameState.completedZones[z.id]);
+      const continueBtnText = document.getElementById('btn-zone-continue-text');
+
+      if (allCompleted) {
+        continueBtnText.textContent = "Lihat Peta Petualangan";
+        confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } });
+        setTimeout(() => confetti({ particleCount: 80, spread: 60, origin: { y: 0.4 } }), 500);
+      } else {
+        if (nextZone) {
+          continueBtnText.textContent = `Lanjut ke Zona 0${nextZone.number}: ${nextZone.title}`;
+        } else {
+          continueBtnText.textContent = "Kembali ke Peta Misi";
+        }
+        confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } });
+      }
+
+      document.getElementById('btn-zone-continue').onclick = () => {
+        if (nextZone && !allCompleted) {
+          startZone(nextZone.id);
+        } else {
+          returnToMap();
+        }
+      };
+    }
+
+    /* =====================================================================
+       10. E-BADGES MODAL DISPLAY
+       ===================================================================== */
+    const modalBadges = document.getElementById('modal-badges');
+    const btnOpenBadges = document.getElementById('btn-open-badges');
+    const btnCloseBadges = document.getElementById('btn-close-badges');
+
+    btnOpenBadges.onclick = () => {
+      playSound('click');
+      renderBadgesModal();
+      modalBadges.classList.remove('hidden');
+    };
+
+    btnCloseBadges.onclick = () => {
+      playSound('click');
+      modalBadges.classList.add('hidden');
+    };
+
+    function renderBadgesModal() {
+      const container = document.getElementById('badges-list-container');
+      container.innerHTML = '';
+
+      ZONES_DATA.forEach(zone => {
+        const isOwned = gameState.badges.includes(zone.badgeId);
+        const card = document.createElement('div');
+        card.className = `p-4 rounded-2xl border-2 transition ${
+          isOwned 
+            ? 'bg-gradient-to-br from-amber-50 to-orange-50 border-amber-300 shadow-sm' 
+            : 'bg-slate-50 border-dashed border-slate-200 opacity-60'
+        }`;
+
+        card.innerHTML = `
+          <div class="flex items-start space-x-3">
+            <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl ${isOwned ? 'bg-amber-100 text-amber-900 border-2 border-amber-300 shadow' : 'bg-slate-200 text-slate-400'}">
+              ${isOwned ? zone.badgeIcon : '🔒'}
+            </div>
+            <div class="font-sans-alt">
+              <div class="flex items-center space-x-1.5">
+                <h5 class="font-bold text-sm ${isOwned ? 'text-amber-950' : 'text-slate-500'}">${zone.badgeName}</h5>
+              </div>
+              <p class="text-[11px] ${isOwned ? 'text-amber-800' : 'text-slate-400'} mt-0.5 leading-snug">${zone.badgeDesc}</p>
+              <div class="mt-2 text-[10px] font-bold ${isOwned ? 'text-emerald-700' : 'text-slate-400'}">
+                ${isOwned ? '✓ Terbuka (Tuntas Zona ' + zone.number + ')' : 'Selesaikan Zona ' + zone.number + ' untuk membuka'}
+              </div>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    document.getElementById('btn-reset-data').onclick = resetGameState;
+    document.getElementById('btn-back-to-map').onclick = returnToMap;
+    document.getElementById('btn-toggle-music').addEventListener('click', toggleBackgroundMusic);
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadSavedState();
+      renderCampaignMap();
+    });
+  </script>
+</body>
+</html>
